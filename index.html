@@ -142,6 +142,24 @@
     /* Scrollable results */
     .results-scroll { max-height: 50vh; overflow: auto; margin: 12px 0; text-align: left; }
 
+    /* Setup screen image */
+    .setup-img-wrap { position: relative; width: min(300px, 60vw); height: min(300px, 60vw); margin: 20px auto; }
+    .setup-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+      transition: opacity .3s ease; }
+    .setup-img-wrap img.frame-hidden { opacity: 0; }
+    .setup-img-wrap img.frame-visible { opacity: 1; }
+
+    /* Wristband image */
+    .wristband-img { width: min(220px, 50vw); margin: 16px auto; display: block; }
+
+    /* ScanTrolly animation */
+    .trolly-img-wrap { position: relative; width: min(70vw, 350px); height: min(70vw, 350px);
+      margin: 0 auto; }
+    .trolly-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+      transition: opacity .3s ease; }
+    .trolly-img-wrap img.frame-hidden { opacity: 0; }
+    .trolly-img-wrap img.frame-visible { opacity: 1; }
+
     /* History bar on start screen */
     .history-bar { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
     .history-bar .row { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
@@ -154,17 +172,116 @@
     .btn.danger-sm { background: transparent; border: 1px solid var(--danger); color: var(--danger);
       font-size: 0.85rem; padding: 8px 14px; }
     .btn.danger-sm::after { display: none; }
+
+    /* Home menu cards */
+    .menu-grid { display: grid; gap: 16px; margin-top: 24px; }
+    .menu-card { display: flex; align-items: center; gap: 16px; padding: 20px;
+      border: 1px solid var(--line); border-radius: 16px; background: var(--card);
+      cursor: pointer; text-align: left; transition: border-color .2s, box-shadow .2s; }
+    .menu-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(34,197,94,.15); }
+    .menu-icon { font-size: 2rem; width: 52px; height: 52px; display: flex; align-items: center;
+      justify-content: center; border-radius: 14px; background: rgba(34,197,94,.1);
+      flex-shrink: 0; }
+    .menu-card .menu-label { font-size: 1.15rem; font-weight: 700; }
+    .menu-card .menu-desc { font-size: .85rem; color: var(--muted); margin-top: 2px; }
+
+    /* Calendar */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; }
+    .cal-nav .cal-title { font-size: 1.15rem; font-weight: 700; }
+    .cal-nav button { background: var(--btn); border: 1px solid var(--line); color: var(--text);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 1rem; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+    .cal-grid .cal-head { font-size: .75rem; color: var(--muted); padding: 6px 0; font-weight: 600; }
+    .cal-grid .cal-day { padding: 10px 4px; border-radius: 10px; font-size: .9rem;
+      cursor: default; color: var(--muted); position: relative; }
+    .cal-grid .cal-day.empty { visibility: hidden; }
+    .cal-grid .cal-day.has-audit { background: rgba(34,197,94,.12); color: var(--text);
+      cursor: pointer; font-weight: 700; border: 1px solid rgba(34,197,94,.25); }
+    .cal-grid .cal-day.has-audit:hover { background: rgba(34,197,94,.25); }
+    .cal-grid .cal-day .cal-dot { position: absolute; bottom: 4px; left: 50%;
+      transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); }
+    .cal-grid .cal-day.today { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 10px; }
+
+    /* Audit list on a day */
+    .audit-list { margin-top: 16px; text-align: left; }
+    .audit-list-item { display: flex; align-items: center; justify-content: space-between;
+      padding: 14px; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--card); margin-bottom: 8px; cursor: pointer;
+      transition: border-color .2s; }
+    .audit-list-item:hover { border-color: var(--accent); }
+    .audit-list-item .ali-time { font-weight: 700; font-size: 1rem; }
+    .audit-list-item .ali-count { font-size: .85rem; color: var(--muted); }
+    .audit-list-item .ali-arrow { color: var(--muted); font-size: 1.2rem; }
+
+    /* Detail back link */
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent);
+      cursor: pointer; font-size: .95rem; font-weight: 600; margin-bottom: 16px;
+      background: none; border: none; padding: 0; }
+    .back-link:hover { text-decoration: underline; }
+
+    /* Screen scroll override for dashboard */
+    .screen.scroll-top { align-items: flex-start; }
   </style>
 </head>
 <body>
 
+  <!-- ========== HOME ========== -->
+  <div class="screen" id="screen-home">
+    <div class="panel">
+      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
+      <p class="muted" style="font-size:1.05rem">Choose an option to get started</p>
+      <div class="menu-grid">
+        <div class="menu-card" id="menuScan">
+          <div class="menu-icon">&#128225;</div>
+          <div><div class="menu-label">Start Scanning</div>
+          <div class="menu-desc">Connect scanner &amp; begin a new audit</div></div>
+        </div>
+        <div class="menu-card" id="menuDashboard">
+          <div class="menu-icon">&#128197;</div>
+          <div><div class="menu-label">Audit History</div>
+          <div class="menu-desc">Calendar view of past submissions</div></div>
+        </div>
+        <div class="menu-card" id="menuDownload">
+          <div class="menu-icon">&#128190;</div>
+          <div><div class="menu-label">Download CSV</div>
+          <div class="menu-desc">Export all submissions as SUBMISSIONS.csv</div></div>
+        </div>
+      </div>
+      <div style="margin-top:20px">
+        <span class="history-badge" id="homeBadge">0 audits saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 0: SETUP / CONNECT ========== -->
+  <div class="screen hidden" id="screen-setup">
+    <div class="panel">
+      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
+      <p class="muted" style="font-size:1.1rem; margin-bottom:8px">
+        Click the button on your scanner to connect
+      </p>
+      <div class="setup-img-wrap">
+        <img src="DoubleDeep.png" id="ddFrame1" class="frame-visible" alt="">
+        <img src="DoubleDeep2.png" id="ddFrame2" class="frame-hidden" alt="">
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn primary" id="btnBegin" style="padding:18px 44px; font-size:1.2rem">
+          Click to Begin &rsaquo;
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== SCREEN 1: CLEAR & START ========== -->
-  <div class="screen" id="screen-start">
+  <div class="screen hidden" id="screen-start">
     <div class="panel">
       <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
       <p class="muted" style="font-size:1.1rem; margin-bottom:20px">
         Point your handheld scanner at this QR code to clear previous data
       </p>
+      <img src="WristBand.png" class="wristband-img" alt="Wristband">
       <div class="qr-wrap"><div id="qrStart"></div></div>
       <p class="muted" style="margin-top:12px">
         Wait for the confirmation beep, then press <strong>Start</strong>
@@ -174,23 +291,20 @@
           Start &rsaquo;
         </button>
       </div>
-      <div class="history-bar" id="historyBar">
-        <div class="row">
-          <span class="history-badge" id="historyBadge">0 audits saved</span>
-          <button class="btn secondary" id="btnExport">Export to Excel</button>
-          <button class="btn danger-sm" id="btnClearHistory">Clear History</button>
-        </div>
-      </div>
     </div>
   </div>
 
   <!-- ========== SCREEN 2: AUDIT IN PROGRESS ========== -->
   <div class="screen hidden" id="screen-audit">
     <div class="audit-hero">
-      <div class="audit-ring" aria-hidden="true">
-        <div class="audit-title">
-          <div class="big">Audit in progress</div>
-          <div class="sub">Scan each item&rsquo;s QR code as you check it.<br>When finished, return to this screen.</div>
+      <div class="trolly-img-wrap" aria-hidden="true">
+        <img src="ScanTrolly.png" id="stFrame1" class="frame-visible" alt="">
+        <img src="ScanTrolly2.png" id="stFrame2" class="frame-hidden" alt="">
+      </div>
+      <div style="text-align:center; margin-top:24px;">
+        <div class="big glow" style="font-size:clamp(1.6rem,3.8vw,2.2rem); font-weight:900;">Audit in progress</div>
+        <div style="margin-top:8px; font-size:clamp(1rem,2.4vw,1.15rem); color:#d3ffd3; line-height:1.4;">
+          Scan each item&rsquo;s QR code as you check it.<br>When finished, return to this screen.
         </div>
       </div>
     </div>
@@ -245,6 +359,48 @@
 
 
 
+  <!-- ========== DASHBOARD ========== -->
+  <div class="screen scroll-top hidden" id="screen-dashboard">
+    <div class="panel wide">
+      <button class="back-link" id="dashBack">&larr; Home</button>
+      <h2 class="glow" style="margin-bottom:4px">Audit History</h2>
+      <p class="muted" style="margin-bottom:16px">Tap a highlighted day to see audits</p>
+      <div class="cal-nav">
+        <button id="calPrev">&lsaquo;</button>
+        <span class="cal-title" id="calTitle"></span>
+        <button id="calNext">&rsaquo;</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="dayAuditList" class="audit-list"></div>
+    </div>
+  </div>
+
+  <!-- ========== AUDIT DETAIL ========== -->
+  <div class="screen scroll-top hidden" id="screen-detail">
+    <div class="panel wide">
+      <button class="back-link" id="detailBack">&larr; Back to Calendar</button>
+      <h2 class="glow" id="detailTitle">Audit Detail</h2>
+      <div class="stats">
+        <div class="stat ok">
+          <div class="label">Matched</div>
+          <div class="value" id="detailMatched">0</div>
+        </div>
+        <div class="stat fail">
+          <div class="label">Unknown</div>
+          <div class="value" id="detailUnknown">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total</div>
+          <div class="value" id="detailTotal">0</div>
+        </div>
+      </div>
+      <div class="results-scroll" id="detailBody"></div>
+      <div style="margin-top:24px; text-align:center;">
+        <button class="btn danger-sm" id="btnDeleteAudit">Delete This Audit</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Hidden input for scanner keyboard-wedge capture -->
   <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false"
          inputmode="none" aria-hidden="true"
@@ -254,8 +410,6 @@
 
   <!-- QRCode.js from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- SheetJS for Excel export -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
   (function(){
     'use strict';
@@ -363,8 +517,44 @@
 
 
     // ===== SCREEN NAVIGATION =====
-    var SCREENS = ['screen-start','screen-audit','screen-upload','screen-results'];
-    var currentScreen = 'screen-start';
+    var SCREENS = ['screen-home','screen-setup','screen-start','screen-audit','screen-upload','screen-results','screen-dashboard','screen-detail'];
+    var currentScreen = 'screen-home';
+
+    // ===== IMAGE ANIMATIONS =====
+    var ddAnimTimer = null;
+    var stAnimTimer = null;
+
+    function startDoubleDeepAnim(){
+      if (ddAnimTimer) return;
+      var f1 = document.getElementById('ddFrame1');
+      var f2 = document.getElementById('ddFrame2');
+      var toggle = false;
+      ddAnimTimer = setInterval(function(){
+        toggle = !toggle;
+        f1.className = toggle ? 'frame-hidden' : 'frame-visible';
+        f2.className = toggle ? 'frame-visible' : 'frame-hidden';
+      }, 1000);
+    }
+
+    function stopDoubleDeepAnim(){
+      if (ddAnimTimer){ clearInterval(ddAnimTimer); ddAnimTimer = null; }
+    }
+
+    function startScanTrollyAnim(){
+      if (stAnimTimer) return;
+      var f1 = document.getElementById('stFrame1');
+      var f2 = document.getElementById('stFrame2');
+      var toggle = false;
+      stAnimTimer = setInterval(function(){
+        toggle = !toggle;
+        f1.className = toggle ? 'frame-hidden' : 'frame-visible';
+        f2.className = toggle ? 'frame-visible' : 'frame-hidden';
+      }, 1000);
+    }
+
+    function stopScanTrollyAnim(){
+      if (stAnimTimer){ clearInterval(stAnimTimer); stAnimTimer = null; }
+    }
 
     function show(id){
       for (var i = 0; i < SCREENS.length; i++){
@@ -374,6 +564,12 @@
       currentScreen = id;
       if (id === 'screen-upload') startFocusLoop();
       else stopFocusLoop();
+
+      // Manage animations
+      if (id === 'screen-setup') startDoubleDeepAnim();
+      else stopDoubleDeepAnim();
+      if (id === 'screen-audit') startScanTrollyAnim();
+      else stopScanTrollyAnim();
     }
 
 
@@ -589,58 +785,253 @@
       history.push({ timestamp: timestamp, items: rows });
       saveHistory(history);
       updateHistoryBadge();
+      downloadSubmissionsCSV();
     }
 
-    function updateHistoryBadge(){
-      var history = getHistory();
-      var badge = document.getElementById('historyBadge');
-      var totalItems = 0;
-      for (var i = 0; i < history.length; i++) totalItems += history[i].items.length;
-      badge.textContent = history.length + ' audit' + (history.length !== 1 ? 's' : '') + ' saved (' + totalItems + ' items)';
+    function csvEscape(val){
+      var s = String(val == null ? '' : val);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1){
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
     }
 
-    function exportToExcel(){
+    function downloadSubmissionsCSV(){
       var history = getHistory();
-      if (history.length === 0){ toast('No audit history to export'); return; }
-      var flat = [];
+      if (history.length === 0) return;
+      var header = 'Date,Time,Audit #,Item ID,Item Name,Room,Matched';
+      var lines = [header];
       for (var i = 0; i < history.length; i++){
         var audit = history[i];
         for (var j = 0; j < audit.items.length; j++){
           var r = audit.items[j];
-          flat.push({
-            'Date': r.date,
-            'Time': r.time,
-            'Audit #': i + 1,
-            'Item ID': r.item_id,
-            'Item Name': r.item_name,
-            'Room': r.room,
-            'Matched': r.matched
-          });
+          lines.push([
+            csvEscape(r.date),
+            csvEscape(r.time),
+            csvEscape(i + 1),
+            csvEscape(r.item_id),
+            csvEscape(r.item_name),
+            csvEscape(r.room),
+            csvEscape(r.matched)
+          ].join(','));
         }
       }
-      if (typeof XLSX === 'undefined'){ toast('Excel library not loaded'); return; }
-      var ws = XLSX.utils.json_to_sheet(flat);
-      // Auto-width columns
-      var colWidths = Object.keys(flat[0]).map(function(key){
-        var max = key.length;
-        for (var k = 0; k < flat.length; k++){
-          var val = String(flat[k][key] || '');
-          if (val.length > max) max = val.length;
-        }
-        return { wch: max + 2 };
-      });
-      ws['!cols'] = colWidths;
-      var wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Audit History');
-      var dateStr = new Date().toISOString().slice(0,10);
-      XLSX.writeFile(wb, 'Audit_History_' + dateStr + '.xlsx');
-      toast('Excel file downloaded');
+      var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'SUBMISSIONS.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
+
+    function updateHistoryBadge(){
+      var history = getHistory();
+      var totalItems = 0;
+      for (var i = 0; i < history.length; i++) totalItems += history[i].items.length;
+      var text = history.length + ' audit' + (history.length !== 1 ? 's' : '') + ' saved (' + totalItems + ' items)';
+      var badge = document.getElementById('homeBadge');
+      if (badge) badge.textContent = text;
+    }
+
+    function exportToCSV(){
+      var history = getHistory();
+      if (history.length === 0){ toast('No audit history to export'); return; }
+      downloadSubmissionsCSV();
+      toast('SUBMISSIONS.csv downloaded');
+    }
+
+
+    // ===== CALENDAR DASHBOARD =====
+    var calYear, calMonth; // 0-indexed month
+
+    function initCalendar(){
+      var now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      renderCalendar();
+    }
+
+    function renderCalendar(){
+      var history = getHistory();
+      // Build set of date strings (DD/MM/YYYY) that have audits
+      var auditDates = {};
+      for (var i = 0; i < history.length; i++){
+        var ts = history[i].timestamp;
+        var d = new Date(ts);
+        var key = d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+        if (!auditDates[key]) auditDates[key] = 0;
+        auditDates[key]++;
+      }
+
+      var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('calTitle').textContent = monthNames[calMonth] + ' ' + calYear;
+
+      var grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+
+      var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      for (var dn = 0; dn < 7; dn++){
+        var hd = document.createElement('div');
+        hd.className = 'cal-head';
+        hd.textContent = dayNames[dn];
+        grid.appendChild(hd);
+      }
+
+      var firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+      var startOffset = (firstDay === 0) ? 6 : firstDay - 1; // Monday-based
+      var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+      var today = new Date();
+      var todayKey = today.getDate() + '/' + today.getMonth() + '/' + today.getFullYear();
+
+      for (var e = 0; e < startOffset; e++){
+        var empty = document.createElement('div');
+        empty.className = 'cal-day empty';
+        grid.appendChild(empty);
+      }
+
+      for (var day = 1; day <= daysInMonth; day++){
+        var cell = document.createElement('div');
+        cell.className = 'cal-day';
+        cell.textContent = day;
+        var cellKey = day + '/' + calMonth + '/' + calYear;
+        if (cellKey === todayKey) cell.classList.add('today');
+        if (auditDates[cellKey]){
+          cell.classList.add('has-audit');
+          var dot = document.createElement('div');
+          dot.className = 'cal-dot';
+          cell.appendChild(dot);
+          (function(d, count){
+            cell.addEventListener('click', function(){ showDayAudits(d); });
+          })(day, auditDates[cellKey]);
+        }
+        grid.appendChild(cell);
+      }
+
+      document.getElementById('dayAuditList').innerHTML = '';
+    }
+
+    function showDayAudits(day){
+      var history = getHistory();
+      var list = document.getElementById('dayAuditList');
+      list.innerHTML = '';
+      var auditsForDay = [];
+      for (var i = 0; i < history.length; i++){
+        var d = new Date(history[i].timestamp);
+        if (d.getDate() === day && d.getMonth() === calMonth && d.getFullYear() === calYear){
+          auditsForDay.push({ index: i, audit: history[i], date: d });
+        }
+      }
+      if (auditsForDay.length === 0){
+        list.innerHTML = '<p class="muted" style="text-align:center">No audits on this day.</p>';
+        return;
+      }
+      for (var j = 0; j < auditsForDay.length; j++){
+        var a = auditsForDay[j];
+        var matched = 0, unknown = 0;
+        for (var k = 0; k < a.audit.items.length; k++){
+          if (a.audit.items[k].matched === 'Yes') matched++; else unknown++;
+        }
+        var div = document.createElement('div');
+        div.className = 'audit-list-item';
+        div.innerHTML = '<div><div class="ali-time">Audit at ' + escapeHtml(a.date.toLocaleTimeString('en-GB')) + '</div>' +
+          '<div class="ali-count">' + a.audit.items.length + ' items &middot; ' + matched + ' matched &middot; ' + unknown + ' unknown</div></div>' +
+          '<span class="ali-arrow">&rsaquo;</span>';
+        (function(idx){
+          div.addEventListener('click', function(){ showAuditDetail(idx); });
+        })(a.index);
+        list.appendChild(div);
+      }
+    }
+
+    function showAuditDetail(historyIndex){
+      var history = getHistory();
+      var audit = history[historyIndex];
+      if (!audit) return;
+      var d = new Date(audit.timestamp);
+      document.getElementById('detailTitle').textContent = 'Audit — ' + d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB');
+
+      var matched = 0, unknown = 0;
+      for (var i = 0; i < audit.items.length; i++){
+        if (audit.items[i].matched === 'Yes') matched++; else unknown++;
+      }
+      document.getElementById('detailMatched').textContent = String(matched);
+      document.getElementById('detailUnknown').textContent = String(unknown);
+      document.getElementById('detailTotal').textContent = String(audit.items.length);
+
+      // Group by room
+      var groups = new Map();
+      for (var j = 0; j < audit.items.length; j++){
+        var r = audit.items[j];
+        var room = (r.matched === 'Yes') ? (r.room || 'Unassigned') : 'Unknown / Not in database';
+        if (!groups.has(room)) groups.set(room, []);
+        groups.get(room).push(r);
+      }
+
+      var container = document.getElementById('detailBody');
+      container.innerHTML = '';
+
+      groups.forEach(function(items, room){
+        var details = document.createElement('details');
+        details.className = 'room-group';
+        details.setAttribute('open', 'open');
+        var isUnknown = room === 'Unknown / Not in database';
+        var summary = document.createElement('summary');
+        summary.innerHTML =
+          '<div class="room-badge">' +
+            '<span class="room-dot' + (isUnknown ? ' unknown' : '') + '"></span>' +
+            '<span>' + escapeHtml(room) + '</span>' +
+          '</div>' +
+          '<span class="room-count">' + items.length + ' item' + (items.length !== 1 ? 's' : '') + '</span>';
+        details.appendChild(summary);
+        var wrap = document.createElement('div');
+        wrap.className = 'group-items';
+        for (var k = 0; k < items.length; k++){
+          var it = items[k];
+          var card = document.createElement('div');
+          card.className = 'item-card';
+          card.innerHTML =
+            '<span class="item-id mono">' + escapeHtml(it.item_id) + '</span>' +
+            '<span class="item-name">' + escapeHtml(it.item_name || '(Unknown item)') + '</span>' +
+            '<span class="' + (it.matched === 'Yes' ? 'match-ok' : 'match-fail') + '">' +
+              (it.matched === 'Yes' ? '\u2713' : '?') + '</span>';
+          wrap.appendChild(card);
+        }
+        details.appendChild(wrap);
+        container.appendChild(details);
+      });
+
+      currentDetailIndex = historyIndex;
+      show('screen-detail');
+    }
+
+    var currentDetailIndex = -1;
 
 
     // ===== BUTTON HANDLERS =====
 
-    // Start -> audit animation -> auto-advance to upload after 4 seconds
+    // Home menu
+    document.getElementById('menuScan').addEventListener('click', function(){
+      show('screen-setup');
+    });
+    document.getElementById('menuDashboard').addEventListener('click', function(){
+      initCalendar();
+      show('screen-dashboard');
+    });
+    document.getElementById('menuDownload').addEventListener('click', function(){
+      exportToCSV();
+    });
+
+    // Setup -> navigate to clear/start screen
+    document.getElementById('btnBegin').addEventListener('click', function(){
+      show('screen-start');
+      renderQR('qrStart', '^&030&^');
+    });
+
+    // Start -> audit animation -> auto-advance to upload after 60 seconds
     document.getElementById('btnStart').addEventListener('click', function(){
       scans = [];
       show('screen-audit');
@@ -652,26 +1043,48 @@
         show('screen-upload');
         renderQR('qrUpload', '^&032&^');
         focusInput();
-      }, 4000);
+      }, 60000);
     });
 
-    // Confirm -> save audit to history -> back to start
+    // Confirm -> save audit to history -> back to home
     document.getElementById('btnConfirm').addEventListener('click', function(){
       saveAudit();
       toast('Audit saved');
       scans = [];
-      show('screen-start');
+      show('screen-home');
     });
 
-    // Export audit history to Excel
-    document.getElementById('btnExport').addEventListener('click', exportToExcel);
+    // Dashboard navigation
+    document.getElementById('dashBack').addEventListener('click', function(){ show('screen-home'); });
+    document.getElementById('calPrev').addEventListener('click', function(){
+      calMonth--;
+      if (calMonth < 0){ calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById('calNext').addEventListener('click', function(){
+      calMonth++;
+      if (calMonth > 11){ calMonth = 0; calYear++; }
+      renderCalendar();
+    });
 
-    // Clear audit history
-    document.getElementById('btnClearHistory').addEventListener('click', function(){
-      if (!confirm('Delete all saved audit history? This cannot be undone.')) return;
-      saveHistory([]);
+    // Detail back
+    document.getElementById('detailBack').addEventListener('click', function(){
+      initCalendar();
+      show('screen-dashboard');
+    });
+
+    // Delete single audit
+    document.getElementById('btnDeleteAudit').addEventListener('click', function(){
+      var input = prompt('Type DELETE to permanently remove this audit.');
+      if (input !== 'DELETE') return;
+      var history = getHistory();
+      if (currentDetailIndex < 0 || currentDetailIndex >= history.length) return;
+      history.splice(currentDetailIndex, 1);
+      saveHistory(history);
       updateHistoryBadge();
-      toast('History cleared');
+      toast('Audit deleted');
+      initCalendar();
+      show('screen-dashboard');
     });
 
 
@@ -691,7 +1104,6 @@
       if (csvLoaded) console.log('Loaded ' + ITEMS.size + ' items from List_Items.csv');
       else console.log('Using ' + ITEMS.size + ' embedded items');
 
-      renderQR('qrStart', '^&030&^');
       updateHistoryBadge();
     }
 
