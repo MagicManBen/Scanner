@@ -232,35 +232,100 @@
     .cal-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
     .cal-legend-dot.green { background: var(--accent); }
     .cal-legend-dot.blue-dot { background: var(--blue); }
+
+    /* Dashboard on home screen */
+    .home-layout { display: flex; gap: 24px; margin-top: 24px; align-items: flex-start; }
+    .home-menu { flex: 1; min-width: 0; }
+    .home-menu .menu-grid { margin-top: 0; }
+    .home-dash { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+    @media (max-width: 800px) {
+      .home-layout { flex-direction: column; }
+    }
+    .dash-widget { background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+      padding: 18px; text-align: left; }
+    .dash-widget h3 { margin: 0 0 14px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+    .dash-widget h3 .dash-icon { font-size: 1.2rem; }
+    .dash-week-row { display: flex; align-items: center; gap: 10px; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04); font-size: .88rem; }
+    .dash-week-row:last-child { border-bottom: none; }
+    .dash-week-row .day-label { width: 32px; font-weight: 700; color: var(--muted); }
+    .dash-week-row .day-date { width: 48px; color: var(--muted); font-size: .8rem; }
+    .dash-week-row .day-status { margin-left: auto; font-weight: 600; font-size: .82rem; }
+    .dash-week-row .day-status.done { color: var(--accent); }
+    .dash-week-row .day-status.missing { color: var(--danger); }
+    .dash-week-row .day-status.pending { color: #f59e0b; }
+    .dash-week-row .day-status.holiday { color: var(--muted); font-style: italic; font-weight: 400; }
+    .dash-week-row .day-status.future { color: var(--muted); font-weight: 400; }
+    .dash-progress { width: 100%; height: 8px; border-radius: 6px; background: rgba(255,255,255,.06);
+      overflow: hidden; margin: 10px 0 6px; }
+    .dash-progress-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
+    .dash-progress-fill.green { background: var(--accent); }
+    .dash-progress-fill.blue { background: var(--blue); }
+    .dash-scan-header { display: flex; align-items: baseline; justify-content: space-between; }
+    .dash-scan-count { font-size: 1.6rem; font-weight: 800; }
+    .dash-scan-pct { font-size: 1rem; font-weight: 700; color: var(--muted); }
+    .dash-unscanned { margin-top: 10px; max-height: 150px; overflow-y: auto; }
+    .dash-unscanned-item { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: .82rem; color: var(--muted); }
+    .dash-unscanned-item:last-child { border-bottom: none; }
+    .dash-fridge-summary { display: flex; align-items: center; gap: 10px; margin-top: 10px;
+      padding: 10px 14px; border-radius: 12px; font-size: .9rem; font-weight: 600; }
+    .dash-fridge-summary.all-good { background: rgba(34,197,94,.1); color: var(--accent); }
+    .dash-fridge-summary.has-issues { background: rgba(239,68,68,.1); color: var(--danger); }
+    .dash-fridge-summary.all-pending { background: rgba(245,158,11,.1); color: #f59e0b; }
+    .dash-week-label { font-size: .8rem; color: var(--muted); margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
   <!-- HOME -->
   <div class="screen" id="screen-home">
-    <div class="panel">
+    <div class="panel wide">
       <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Nursing Team Checks</h1>
       <p class="muted" style="font-size:1.05rem">Choose an option to get started</p>
-      <div class="menu-grid">
-        <div class="menu-card" id="menuScan">
-          <div class="menu-icon">&#128225;</div>
-          <div><div class="menu-label">Room Audit</div>
-          <div class="menu-desc">Connect scanner &amp; begin a room audit</div></div>
+      <div class="home-layout">
+        <div class="home-menu">
+          <div class="menu-grid">
+            <div class="menu-card" id="menuScan">
+              <div class="menu-icon">&#128225;</div>
+              <div><div class="menu-label">Room Audit</div>
+              <div class="menu-desc">Connect scanner &amp; begin a room audit</div></div>
+            </div>
+            <div class="menu-card blue" id="menuFridge">
+              <div class="menu-icon blue-bg">&#127777;</div>
+              <div><div class="menu-label">Fridge Temp Check</div>
+              <div class="menu-desc">Log medicines storage temperatures</div></div>
+            </div>
+            <div class="menu-card" id="menuDashboard">
+              <div class="menu-icon">&#128197;</div>
+              <div><div class="menu-label">History &amp; Calendar</div>
+              <div class="menu-desc">View all past submissions</div></div>
+            </div>
+            <div class="menu-card" id="menuDownload">
+              <div class="menu-icon">&#128190;</div>
+              <div><div class="menu-label">Download Excel</div>
+              <div class="menu-desc">Export all records as .xlsx workbook</div></div>
+            </div>
+          </div>
         </div>
-        <div class="menu-card blue" id="menuFridge">
-          <div class="menu-icon blue-bg">&#127777;</div>
-          <div><div class="menu-label">Fridge Temp Check</div>
-          <div class="menu-desc">Log medicines storage temperatures</div></div>
-        </div>
-        <div class="menu-card" id="menuDashboard">
-          <div class="menu-icon">&#128197;</div>
-          <div><div class="menu-label">History &amp; Calendar</div>
-          <div class="menu-desc">View all past submissions</div></div>
-        </div>
-        <div class="menu-card" id="menuDownload">
-          <div class="menu-icon">&#128190;</div>
-          <div><div class="menu-label">Download Excel</div>
-          <div class="menu-desc">Export all records as .xlsx workbook</div></div>
+        <div class="home-dash">
+          <!-- Fridge Temp Widget -->
+          <div class="dash-widget">
+            <h3><span class="dash-icon">&#127777;</span> Fridge Checks &mdash; This Week</h3>
+            <div class="dash-week-label" id="dashWeekLabel"></div>
+            <div id="dashFridgeBody"></div>
+            <div id="dashFridgeSummary"></div>
+          </div>
+          <!-- Room Audit Widget -->
+          <div class="dash-widget">
+            <h3><span class="dash-icon">&#128225;</span> Room Audit &mdash; This Week</h3>
+            <div class="dash-scan-header">
+              <span class="dash-scan-count" id="dashScanCount">0 / 0</span>
+              <span class="dash-scan-pct" id="dashScanPct">0%</span>
+            </div>
+            <div class="dash-progress"><div class="dash-progress-fill green" id="dashScanBar" style="width:0%"></div></div>
+            <div class="dash-unscanned" id="dashScanUnscanned"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -597,6 +662,7 @@
       if (id === 'screen-upload') startFocusLoop(); else stopFocusLoop();
       if (id === 'screen-setup') startDoubleDeepAnim(); else stopDoubleDeepAnim();
       if (id === 'screen-audit') startScanTrollyAnim(); else stopScanTrollyAnim();
+      if (id === 'screen-home') updateHomeDashboard();
       window.scrollTo(0,0);
     }
 
@@ -710,6 +776,17 @@
     }
 
 
+    /* ===== UK BANK HOLIDAYS (England & Wales) ===== */
+    var BANK_HOLIDAYS = new Set([
+      '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26',
+      '2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
+      '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28'
+    ]);
+    function isBankHoliday(d){ var y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), day=('0'+d.getDate()).slice(-2); return BANK_HOLIDAYS.has(y+'-'+m+'-'+day); }
+    function getMonday(d){ var day=d.getDay(), diff=d.getDate()-day+(day===0?-6:1); return new Date(d.getFullYear(),d.getMonth(),diff); }
+    function fmtShortDate(d){ return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2); }
+    function fmtDDMMYYYY(d){ return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }
+
     /* ===== STORAGE ===== */
     var SCAN_KEY = 'scannerAuditHistory';
     var FRIDGE_KEY = 'fridgeTempHistory';
@@ -750,6 +827,73 @@
       var history = getFridgeHistory();
       history.push(record);
       saveFridgeHistory(history);
+    }
+
+
+    /* ===== HOME DASHBOARD ===== */
+    function updateHomeDashboard(){
+      var today = new Date(); today.setHours(0,0,0,0);
+      var monday = getMonday(today);
+      var sunday = new Date(monday); sunday.setDate(sunday.getDate()+6); sunday.setHours(23,59,59,999);
+
+      // Week label
+      document.getElementById('dashWeekLabel').textContent = fmtShortDate(monday)+' \u2013 '+fmtShortDate(sunday);
+
+      // --- Fridge ---
+      var fridgeH = getFridgeHistory();
+      var fridgeDates = new Set();
+      for (var i=0;i<fridgeH.length;i++) fridgeDates.add(fridgeH[i].date);
+
+      var dayNames=['Mon','Tue','Wed','Thu','Fri'], html='', doneCount=0, missCount=0, pendCount=0;
+      for (var d=0;d<5;d++){
+        var dd = new Date(monday); dd.setDate(monday.getDate()+d);
+        var dateStr = fmtDDMMYYYY(dd), shortStr = fmtShortDate(dd);
+        var holiday = isBankHoliday(dd), future = dd>today, isToday = dd.getTime()===today.getTime();
+        var done = fridgeDates.has(dateStr);
+        var cls,txt;
+        if (holiday){ cls='holiday'; txt='Bank Holiday'; }
+        else if (done){ cls='done'; txt='\u2713 Done'; doneCount++; }
+        else if (isToday){ cls='pending'; txt='\u23f3 Pending'; pendCount++; }
+        else if (future){ cls='future'; txt='\u2014'; }
+        else { cls='missing'; txt='\u2717 Missing'; missCount++; }
+        html+='<div class="dash-week-row"><span class="day-label">'+dayNames[d]+'</span>'+
+          '<span class="day-date">'+shortStr+'</span>'+
+          '<span class="day-status '+cls+'">'+txt+'</span></div>';
+      }
+      document.getElementById('dashFridgeBody').innerHTML = html;
+
+      var sumEl = document.getElementById('dashFridgeSummary');
+      if (missCount>0) sumEl.innerHTML='<div class="dash-fridge-summary has-issues">\u26a0 '+missCount+' missed day'+(missCount>1?'s':'')+'</div>';
+      else if (pendCount>0 && doneCount>0) sumEl.innerHTML='<div class="dash-fridge-summary all-pending">\u23f3 Today\'s check still pending</div>';
+      else if (doneCount>0 && pendCount===0 && missCount===0) sumEl.innerHTML='<div class="dash-fridge-summary all-good">\u2713 All checks complete so far</div>';
+      else sumEl.innerHTML='';
+
+      // --- Room Audit ---
+      var scanH = getScanHistory(), scannedIds = new Set();
+      var monISO = monday.toISOString(), sunISO = sunday.toISOString();
+      for (var j=0;j<scanH.length;j++){
+        var a = scanH[j];
+        if (a.timestamp>=monISO && a.timestamp<=sunISO){
+          for (var k=0;k<a.items.length;k++) if (a.items[k].matched==='Yes') scannedIds.add(a.items[k].item_id);
+        }
+      }
+      var total = EMBEDDED_ITEMS.length, scanned=0, unscanned=[];
+      for (var m=0;m<EMBEDDED_ITEMS.length;m++){
+        if (scannedIds.has(EMBEDDED_ITEMS[m].id)) scanned++;
+        else unscanned.push(EMBEDDED_ITEMS[m]);
+      }
+      var pct = total>0?Math.round(scanned/total*100):0;
+      document.getElementById('dashScanCount').textContent = scanned+' / '+total+' items';
+      document.getElementById('dashScanPct').textContent = pct+'%';
+      document.getElementById('dashScanBar').style.width = pct+'%';
+
+      var uhtml='';
+      if (scanned===total && total>0){ uhtml='<div style="color:var(--accent);font-size:.9rem;margin-top:6px;font-weight:600">\u2713 All items scanned this week</div>'; }
+      else if (scanned>0 || total>0){
+        uhtml='<div style="font-size:.82rem;color:var(--muted);margin-top:8px;font-weight:600">Not yet scanned ('+unscanned.length+'):</div>';
+        for (var n=0;n<unscanned.length;n++) uhtml+='<div class="dash-unscanned-item">'+escapeHtml(unscanned[n].name)+' <span style="opacity:.6">('+escapeHtml(unscanned[n].room)+')</span></div>';
+      }
+      document.getElementById('dashScanUnscanned').innerHTML = uhtml;
     }
 
 
@@ -1134,6 +1278,7 @@
       var csvLoaded = await tryLoadCSV();
       if (csvLoaded) console.log('Loaded '+ITEMS.size+' items from List_Items.csv');
       else console.log('Using '+ITEMS.size+' embedded items');
+      updateHomeDashboard();
     }
     init();
 
