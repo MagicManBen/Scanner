@@ -817,6 +817,58 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <!-- DEBUG CONSOLE -->
+  <div id="debugPanel" style="position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#111;border-top:2px solid #22c55e;font-family:ui-monospace,monospace;font-size:12px;max-height:40vh;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0;">
+      <span style="color:#22c55e;font-weight:700;">Debug Console</span>
+      <div style="display:flex;gap:8px;">
+        <button onclick="copyDebugLog()" style="background:#22c55e;color:#000;border:none;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Copy All</button>
+        <button onclick="clearDebugLog()" style="background:#333;color:#aaa;border:none;padding:4px 12px;border-radius:6px;font-size:11px;cursor:pointer;">Clear</button>
+        <button onclick="document.getElementById('debugPanel').style.display='none'" style="background:#333;color:#aaa;border:none;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer;">X</button>
+      </div>
+    </div>
+    <div id="debugLog" style="overflow-y:auto;padding:8px 12px;flex:1;"></div>
+  </div>
+
+  <script>
+    var _debugLines = [];
+    function dbg(msg, color) {
+      color = color || '#ccc';
+      var ts = new Date().toLocaleTimeString('en-GB');
+      var line = '[' + ts + '] ' + msg;
+      _debugLines.push(line);
+      var el = document.getElementById('debugLog');
+      if (el) {
+        var div = document.createElement('div');
+        div.style.color = color;
+        div.style.padding = '2px 0';
+        div.style.borderBottom = '1px solid #222';
+        div.style.wordBreak = 'break-all';
+        div.textContent = line;
+        el.appendChild(div);
+        el.scrollTop = el.scrollHeight;
+      }
+    }
+    function copyDebugLog() {
+      var text = _debugLines.join('\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function(){ dbg('Copied to clipboard', '#22c55e'); });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        dbg('Copied to clipboard', '#22c55e');
+      }
+    }
+    function clearDebugLog() {
+      _debugLines = [];
+      var el = document.getElementById('debugLog');
+      if (el) el.innerHTML = '';
+    }
+    // Expose globally for the IIFE
+    window.dbg = dbg;
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
@@ -1140,25 +1192,38 @@
     var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywfRa9Ad6evBMwaZpbBOOCqfvQnL2dRk7DNFjHi8mFW7C26_2fVcz26-MAucDAOwmA/exec';
 
     function pushToSheet(type, payload){
-      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) { console.warn('Google Script URL not configured'); return; }
+      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) { dbg('SKIP: Google Script URL not configured', '#ff9500'); return; }
+      var body = JSON.stringify(Object.assign({ type: type }, payload));
+      dbg('pushToSheet(' + type + ') → POST ' + GOOGLE_SCRIPT_URL.substring(0, 60) + '...', '#5ac8fa');
+      dbg('Payload: ' + body.substring(0, 300) + (body.length > 300 ? '...' : ''), '#888');
       try {
         fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify(Object.assign({ type: type }, payload)),
+          redirect: 'follow',
+          body: body,
           headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         }).then(function(r){
-          if (r.ok) console.log('Logged to Google Sheet (' + type + ')');
-          else console.warn('Sheet POST status:', r.status);
-        }).catch(function(e){ console.warn('Sheet sync failed:', e); });
-      } catch(e){ console.warn('pushToSheet error:', e); }
+          dbg('POST response: status=' + r.status + ' ok=' + r.ok + ' type=' + r.type + ' url=' + r.url.substring(0, 80), r.ok ? '#22c55e' : '#ff3b30');
+          return r.text();
+        }).then(function(txt){
+          dbg('Response body: ' + (txt || '(empty)').substring(0, 500), '#aaa');
+        }).catch(function(e){
+          dbg('POST FAILED: ' + e.message + ' | ' + String(e), '#ff3b30');
+        });
+      } catch(e){ dbg('pushToSheet error: ' + e.message, '#ff3b30'); }
     }
 
     async function loadFromSheet(){
-      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) return;
+      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) { dbg('SKIP loadFromSheet: URL not configured', '#ff9500'); return; }
+      dbg('loadFromSheet() → GET ' + GOOGLE_SCRIPT_URL.substring(0, 60) + '?action=all', '#5ac8fa');
       try {
         var r = await fetch(GOOGLE_SCRIPT_URL + '?action=all');
-        if (!r.ok) return;
-        var data = await r.json();
+        dbg('GET response: status=' + r.status + ' ok=' + r.ok + ' type=' + r.type, r.ok ? '#22c55e' : '#ff3b30');
+        if (!r.ok) { dbg('GET failed, aborting load', '#ff3b30'); return; }
+        var rawText = await r.text();
+        dbg('GET body (' + rawText.length + ' chars): ' + rawText.substring(0, 400) + (rawText.length > 400 ? '...' : ''), '#aaa');
+        var data = JSON.parse(rawText);
+        if (data.error) { dbg('Sheet returned error: ' + data.error, '#ff3b30'); return; }
 
         // Merge fridge records
         if (data.fridge && data.fridge.length) {
@@ -1186,7 +1251,8 @@
               added++;
             }
           }
-          if (added > 0) { saveFridgeHistory(localF); console.log('Merged ' + added + ' fridge records from Google Sheet'); }
+          dbg('Fridge merge: ' + added + ' new records from sheet (total in sheet: ' + data.fridge.length + ')', added > 0 ? '#22c55e' : '#aaa');
+          if (added > 0) { saveFridgeHistory(localF); }
         }
 
         // Merge audit records
@@ -1215,9 +1281,10 @@
               addedA++;
             }
           }
-          if (addedA > 0) { saveScanHistory(localS); console.log('Merged ' + addedA + ' audit records from Google Sheet'); }
+          dbg('Audit merge: ' + addedA + ' new records from sheet (total in sheet: ' + data.audit.length + ')', addedA > 0 ? '#22c55e' : '#aaa');
+          if (addedA > 0) { saveScanHistory(localS); }
         }
-      } catch(e){ console.warn('loadFromSheet failed (offline?):', e); }
+      } catch(e){ dbg('loadFromSheet FAILED: ' + e.message + ' | ' + String(e), '#ff3b30'); }
     }
 
     function saveScanAudit(){
@@ -1249,12 +1316,14 @@
           item_comment: itemComment
         });
       });
-      if (rows.length === 0) return;
+      if (rows.length === 0) { dbg('saveScanAudit: no rows to save', '#ff9500'); return; }
+      dbg('saveScanAudit: saving ' + rows.length + ' items', '#22c55e');
       var history = getScanHistory();
       history.push({ timestamp: timestamp, type: 'scan', overall_comments: overallComments, items: rows });
       saveScanHistory(history);
 
       // Push to Google Sheet
+      dbg('saveScanAudit: pushing to sheet...', '#5ac8fa');
       pushToSheet('audit', { rows: rows, overall_comments: overallComments });
     }
 
@@ -1278,6 +1347,8 @@
       saveFridgeHistory(history);
 
       // Push to Google Sheet
+      dbg('saveFridgeCheck: Fridge ' + data.fridge_number + ' | ' + data.current + '°C | by ' + data.checked_by, '#22c55e');
+      dbg('saveFridgeCheck: pushing to sheet...', '#5ac8fa');
       pushToSheet('fridge', { rows: [{
         fridge: 'Fridge ' + data.fridge_number,
         date: data.date,
@@ -1860,14 +1931,16 @@
 
     /* ===== INIT ===== */
     async function init(){
+      dbg('init() starting...', '#5ac8fa');
       loadEmbeddedItems();
       var csvLoaded = await tryLoadCSV();
-      if (csvLoaded) console.log('Loaded '+ITEMS.size+' items from List_Items.csv');
-      else console.log('Using '+ITEMS.size+' embedded items');
+      dbg(csvLoaded ? 'Loaded '+ITEMS.size+' items from CSV' : 'Using '+ITEMS.size+' embedded items', '#22c55e');
+      dbg('GOOGLE_SCRIPT_URL = ' + GOOGLE_SCRIPT_URL, '#ff9500');
 
       // Merge any records from Google Sheet that this device doesn't have yet
       await loadFromSheet();
 
+      dbg('init() complete', '#22c55e');
       updateHomeDashboard();
     }
     init();
