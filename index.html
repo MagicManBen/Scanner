@@ -296,50 +296,92 @@
     .cal-legend-dot.green { background: var(--accent); }
     .cal-legend-dot.blue-dot { background: var(--blue); }
 
-    /* Dashboard on home screen */
-    .home-layout { display: flex; gap: 20px; margin-top: 24px; align-items: flex-start; }
-    .home-menu { flex: 0 0 auto; width: 44%; min-width: 0; }
-    .home-menu .menu-grid { margin-top: 0; gap: 12px; }
-    .home-dash { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-    @media (max-width: 540px) {
-      .home-layout { flex-direction: column; }
-      .home-menu { width: 100%; }
+    /* ===== Home dashboard – at-a-glance layout ===== */
+    .today-date-label { font-size: .95rem; color: var(--muted); margin-bottom: 0; }
+
+    /* Status tiles */
+    .today-section { margin-top: 20px; text-align: left; }
+    .section-label { font-size: .7rem; font-weight: 800; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 10px; }
+    .status-tiles { display: flex; gap: 12px; }
+    .status-tile { flex: 1; padding: 16px 18px; border-radius: 16px;
+      background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 2px solid var(--glass-border); text-align: left;
+      transition: border-color .3s, box-shadow .3s; cursor: default; }
+    .status-tile .st-icon { display: flex; align-items: center; gap: 7px;
+      font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 8px; }
+    .status-tile .st-icon img { width: 20px; height: 20px; }
+    .status-tile .st-main { font-size: 1.08rem; font-weight: 700; line-height: 1.3; }
+    .status-tile .st-detail { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+    .status-tile.good { border-color: rgba(52,199,89,.45); background: rgba(52,199,89,.07); }
+    .status-tile.good .st-main { color: #1a7a33; }
+    .status-tile.warning { border-color: rgba(255,149,0,.45); background: rgba(255,149,0,.07); }
+    .status-tile.warning .st-main { color: #c77800; }
+    .status-tile.urgent { border-color: rgba(255,59,48,.5); background: rgba(255,59,48,.07);
+      animation: urgentPulse 2.2s ease-in-out infinite; }
+    .status-tile.urgent .st-main { color: var(--danger); }
+    @keyframes urgentPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,.12); }
+      50%     { box-shadow: 0 0 18px 4px rgba(255,59,48,.1); }
     }
+    @media (max-width: 480px) { .status-tiles { flex-direction: column; } }
+
+    /* Quick-action strip */
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 4px; }
+    .qa-card { display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 6px; border-radius: 16px;
+      background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); cursor: pointer; text-align: center;
+      transition: transform .15s, box-shadow .2s, border-color .2s;
+      box-shadow: 0 2px 10px rgba(0,0,0,.03); }
+    .qa-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,.08);
+      border-color: var(--accent); }
+    .qa-card.blue-hover:hover { border-color: var(--blue); box-shadow: 0 6px 22px rgba(0,122,255,.1); }
+    .qa-card img { width: 30px; height: 30px; }
+    .qa-card .qa-label { font-size: .78rem; font-weight: 700; line-height: 1.2; }
+    @media (max-width: 480px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
+
+    /* Weekly detail */
+    .weekly-section { margin-top: 14px; text-align: left; }
+    .weekly-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .weekly-widgets { grid-template-columns: 1fr; } }
     .dash-widget { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: 18px;
-      padding: 18px; text-align: left;
+      border: 1px solid var(--glass-border); border-radius: 16px;
+      padding: 16px; text-align: left;
       box-shadow: 0 2px 12px rgba(0,0,0,.04); }
-    .dash-widget h3 { margin: 0 0 14px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-    .dash-widget h3 .dash-icon { font-size: 1.2rem; }
-    .dash-week-row { display: flex; align-items: center; gap: 10px; padding: 7px 0;
-      border-bottom: 1px solid rgba(0,0,0,.04); font-size: .88rem; }
+    .dash-widget h3 { margin: 0 0 10px; font-size: .88rem; display: flex; align-items: center; gap: 7px;
+      color: var(--muted); }
+    .dash-widget h3 .dash-icon img { width: 18px; height: 18px; }
+    .dash-week-row { display: flex; align-items: center; gap: 10px; padding: 5px 0;
+      border-bottom: 1px solid rgba(0,0,0,.04); font-size: .84rem; }
     .dash-week-row:last-child { border-bottom: none; }
-    .dash-week-row .day-label { width: 32px; font-weight: 700; color: var(--muted); }
-    .dash-week-row .day-date { width: 48px; color: var(--muted); font-size: .8rem; }
-    .dash-week-row .day-status { margin-left: auto; font-weight: 600; font-size: .82rem; }
+    .dash-week-row .day-label { width: 30px; font-weight: 700; color: var(--muted); font-size: .8rem; }
+    .dash-week-row .day-date { width: 44px; color: var(--muted); font-size: .76rem; }
+    .dash-week-row .day-status { margin-left: auto; font-weight: 600; font-size: .78rem; }
     .dash-week-row .day-status.done { color: var(--accent); }
     .dash-week-row .day-status.missing { color: var(--danger); }
     .dash-week-row .day-status.pending { color: var(--orange); }
     .dash-week-row .day-status.holiday { color: var(--muted); font-style: italic; font-weight: 400; }
     .dash-week-row .day-status.future { color: var(--muted); font-weight: 400; }
-    .dash-progress { width: 100%; height: 8px; border-radius: 6px; background: rgba(0,0,0,.06);
-      overflow: hidden; margin: 10px 0 6px; }
+    .dash-progress { width: 100%; height: 7px; border-radius: 6px; background: rgba(0,0,0,.06);
+      overflow: hidden; margin: 8px 0 4px; }
     .dash-progress-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
     .dash-progress-fill.green { background: linear-gradient(90deg, #34c759, #30d158); }
     .dash-progress-fill.blue { background: linear-gradient(90deg, #007aff, #5ac8fa); }
     .dash-scan-header { display: flex; align-items: baseline; justify-content: space-between; }
-    .dash-scan-count { font-size: 1.6rem; font-weight: 800; }
-    .dash-scan-pct { font-size: 1rem; font-weight: 700; color: var(--muted); }
-    .dash-unscanned { margin-top: 10px; max-height: 150px; overflow-y: auto; }
-    .dash-unscanned-item { padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,.04);
-      font-size: .82rem; color: var(--muted); }
+    .dash-scan-count { font-size: 1.3rem; font-weight: 800; }
+    .dash-scan-pct { font-size: .9rem; font-weight: 700; color: var(--muted); }
+    .dash-unscanned { margin-top: 8px; max-height: 120px; overflow-y: auto; }
+    .dash-unscanned-item { padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,.04);
+      font-size: .78rem; color: var(--muted); }
     .dash-unscanned-item:last-child { border-bottom: none; }
-    .dash-fridge-summary { display: flex; align-items: center; gap: 10px; margin-top: 10px;
-      padding: 10px 14px; border-radius: 14px; font-size: .9rem; font-weight: 600; }
+    .dash-fridge-summary { display: flex; align-items: center; gap: 8px; margin-top: 8px;
+      padding: 8px 12px; border-radius: 12px; font-size: .82rem; font-weight: 600; }
     .dash-fridge-summary.all-good { background: rgba(52,199,89,.1); color: #1a7a33; }
     .dash-fridge-summary.has-issues { background: rgba(255,59,48,.08); color: var(--danger); }
     .dash-fridge-summary.all-pending { background: rgba(255,149,0,.1); color: #c77800; }
-    .dash-week-label { font-size: .8rem; color: var(--muted); margin-bottom: 10px; }
+    .dash-week-label { font-size: .76rem; color: var(--muted); margin-bottom: 8px; }
 
     /* Fridge picker */
     .fridge-picker { display: flex; gap: 16px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
@@ -468,45 +510,58 @@
   <!-- HOME -->
   <div class="screen" id="screen-home">
     <div class="panel wide">
-      <img src="https://cdn-icons-png.flaticon.com/128/14596/14596114.png" class="header-illustration" alt="">
-      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Nursing Team Checks</h1>
-      <p class="muted" style="font-size:1.05rem">Choose an option to get started</p>
-      <div class="home-layout">
-        <div class="home-menu">
-          <div class="menu-grid">
-            <div class="menu-card" id="menuScan">
-              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""></div>
-              <div><div class="menu-label">Room Audit</div>
-              <div class="menu-desc">Connect scanner &amp; begin a room audit</div></div>
-            </div>
-            <div class="menu-card blue" id="menuFridge">
-              <div class="menu-icon blue-bg"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></div>
-              <div><div class="menu-label">Fridge Temp Check</div>
-              <div class="menu-desc">Log medicines storage temperatures</div></div>
-            </div>
-            <div class="menu-card" id="menuDashboard">
-              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" alt=""></div>
-              <div><div class="menu-label">History &amp; Calendar</div>
-              <div class="menu-desc">View all past submissions</div></div>
-            </div>
-            <div class="menu-card" id="menuDownload">
-              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14596/14596179.png" alt=""></div>
-              <div><div class="menu-label">Download Excel</div>
-              <div class="menu-desc">Export all records as .xlsx workbook</div></div>
-            </div>
+      <img src="https://cdn-icons-png.flaticon.com/128/14596/14596114.png" class="header-illustration" style="width:min(72px,16vw)" alt="">
+      <h1 class="glow" style="font-size:clamp(1.6rem,4.5vw,2.1rem);margin-bottom:4px">Nursing Team Checks</h1>
+      <p class="today-date-label" id="todayDateLabel"></p>
+
+      <!-- TODAY'S STATUS -->
+      <div class="today-section">
+        <div class="section-label">Today&rsquo;s Status</div>
+        <div class="status-tiles">
+          <div class="status-tile neutral" id="statusFridge">
+            <div class="st-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""> Fridge Check</div>
+            <div class="st-main">&hellip;</div>
+            <div class="st-detail"></div>
+          </div>
+          <div class="status-tile neutral" id="statusAudit">
+            <div class="st-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""> Room Audit</div>
+            <div class="st-main">&hellip;</div>
+            <div class="st-detail"></div>
           </div>
         </div>
-        <div class="home-dash">
-          <!-- Fridge Temp Widget -->
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-actions">
+        <div class="qa-card" id="menuScan">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt="">
+          <div class="qa-label">Room Audit</div>
+        </div>
+        <div class="qa-card blue-hover" id="menuFridge">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt="">
+          <div class="qa-label">Fridge Check</div>
+        </div>
+        <div class="qa-card" id="menuDashboard">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" alt="">
+          <div class="qa-label">History</div>
+        </div>
+        <div class="qa-card" id="menuDownload">
+          <img src="https://cdn-icons-png.flaticon.com/128/14596/14596179.png" alt="">
+          <div class="qa-label">Download</div>
+        </div>
+      </div>
+
+      <!-- WEEKLY DETAIL -->
+      <div class="weekly-section">
+        <div class="section-label">This Week &mdash; <span id="dashWeekLabel"></span></div>
+        <div class="weekly-widgets">
           <div class="dash-widget">
-            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></span> Fridge Checks &mdash; This Week</h3>
-            <div class="dash-week-label" id="dashWeekLabel"></div>
+            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></span> Fridge Checks</h3>
             <div id="dashFridgeBody"></div>
             <div id="dashFridgeSummary"></div>
           </div>
-          <!-- Room Audit Widget -->
           <div class="dash-widget">
-            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""></span> Room Audit &mdash; This Week</h3>
+            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""></span> Room Audit</h3>
             <div class="dash-scan-header">
               <span class="dash-scan-count" id="dashScanCount">0 / 0</span>
               <span class="dash-scan-pct" id="dashScanPct">0%</span>
@@ -516,6 +571,7 @@
           </div>
         </div>
       </div>
+
       <div class="flaticon-attr">Icons by <a href="https://www.flaticon.com/authors/juicy-fish" target="_blank" rel="noopener">juicy_fish</a> &mdash; <a href="https://www.flaticon.com/packs/medical-14595708" target="_blank" rel="noopener">Flaticon</a></div>
     </div>
   </div>
@@ -1135,51 +1191,62 @@
 
     /* ===== HOME DASHBOARD ===== */
     function updateHomeDashboard(){
+      var now = new Date();
       var today = new Date(); today.setHours(0,0,0,0);
       var monday = getMonday(today);
       var sunday = new Date(monday); sunday.setDate(sunday.getDate()+6); sunday.setHours(23,59,59,999);
 
+      // Date heading
+      var dNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var mNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('todayDateLabel').textContent = dNames[now.getDay()]+' '+now.getDate()+' '+mNames[now.getMonth()];
+
       // Week label
       document.getElementById('dashWeekLabel').textContent = fmtShortDate(monday)+' \u2013 '+fmtShortDate(sunday);
 
-      // --- Fridge ---
+      // ---- Gather fridge data ----
       var fridgeH = getFridgeHistory();
+      var todayStr = fmtDDMMYYYY(today);
       var fridgeDatesF1 = new Set(), fridgeDatesF2 = new Set();
+      var todayF1 = false, todayF2 = false;
       for (var i=0;i<fridgeH.length;i++){
         var fn = fridgeH[i].fridge_number || 1;
-        if (fn === 1 || fn === '1') fridgeDatesF1.add(fridgeH[i].date);
-        else fridgeDatesF2.add(fridgeH[i].date);
+        if (fn===1||fn==='1'){ fridgeDatesF1.add(fridgeH[i].date); if(fridgeH[i].date===todayStr) todayF1=true; }
+        else { fridgeDatesF2.add(fridgeH[i].date); if(fridgeH[i].date===todayStr) todayF2=true; }
       }
 
-      var dayNames=['Mon','Tue','Wed','Thu','Fri'], html='', doneCount=0, missCount=0, pendCount=0;
-      for (var d=0;d<5;d++){
-        var dd = new Date(monday); dd.setDate(monday.getDate()+d);
-        var dateStr = fmtDDMMYYYY(dd), shortStr = fmtShortDate(dd);
-        var holiday = isBankHoliday(dd), future = dd>today, isToday = dd.getTime()===today.getTime();
-        var doneF1 = fridgeDatesF1.has(dateStr), doneF2 = fridgeDatesF2.has(dateStr);
-        var done = doneF1 && doneF2;
-        var partial = (doneF1 || doneF2) && !done;
-        var cls,txt;
-        if (holiday){ cls='holiday'; txt='Bank Holiday'; }
-        else if (done){ cls='done'; txt='\u2713 Both done'; doneCount++; }
-        else if (partial && !future && !isToday){ cls='missing'; txt='\u26a0 '+(doneF1?'F2':'F1')+' missing'; missCount++; }
-        else if (partial && (isToday||future)){ cls='pending'; txt='\u2713 '+(doneF1?'F1':'F2')+' done'; if(isToday) pendCount++; }
-        else if (isToday){ cls='pending'; txt='\u23f3 Pending'; pendCount++; }
-        else if (future){ cls='future'; txt='\u2014'; }
-        else { cls='missing'; txt='\u2717 Missing'; missCount++; }
-        html+='<div class="dash-week-row"><span class="day-label">'+dayNames[d]+'</span>'+
-          '<span class="day-date">'+shortStr+'</span>'+
-          '<span class="day-status '+cls+'">'+txt+'</span></div>';
+      var holiday = isBankHoliday(today);
+      var isWeekend = today.getDay()===0||today.getDay()===6;
+      var past1030 = now.getHours()>10||(now.getHours()===10&&now.getMinutes()>=30);
+
+      // ---- Today: Fridge status tile ----
+      var fEl = document.getElementById('statusFridge');
+      fEl.className = 'status-tile';
+      var fMain='', fDetail='', fClass='neutral';
+
+      if (holiday||isWeekend){
+        fMain='No check required'; fDetail=holiday?'Bank Holiday':'Weekend';
+      } else if (todayF1&&todayF2){
+        fMain='\u2713 Both fridges checked'; fDetail='Fridge 1 & Fridge 2 complete'; fClass='good';
+      } else if (todayF1||todayF2){
+        var missingF=todayF1?'Fridge 2':'Fridge 1', doneF=todayF1?'Fridge 1':'Fridge 2';
+        if (past1030){
+          fMain='\u26a0 '+missingF+' overdue'; fDetail=doneF+' done \u00b7 Was due by 10:30\u202fAM'; fClass='urgent';
+        } else {
+          fMain=doneF+' done'; fDetail=missingF+' still due by 10:30\u202fAM'; fClass='warning';
+        }
+      } else {
+        if (past1030){
+          fMain='\u26a0 Overdue'; fDetail='Both fridges were due by 10:30\u202fAM'; fClass='urgent';
+        } else {
+          fMain='Due by 10:30\u202fAM'; fDetail='Fridge 1 & Fridge 2 need checking'; fClass='warning';
+        }
       }
-      document.getElementById('dashFridgeBody').innerHTML = html;
+      fEl.classList.add(fClass);
+      fEl.querySelector('.st-main').textContent = fMain;
+      fEl.querySelector('.st-detail').textContent = fDetail;
 
-      var sumEl = document.getElementById('dashFridgeSummary');
-      if (missCount>0) sumEl.innerHTML='<div class="dash-fridge-summary has-issues">\u26a0 '+missCount+' missed day'+(missCount>1?'s':'')+'</div>';
-      else if (pendCount>0 && doneCount>0) sumEl.innerHTML='<div class="dash-fridge-summary all-pending">\u23f3 Today\'s check still pending</div>';
-      else if (doneCount>0 && pendCount===0 && missCount===0) sumEl.innerHTML='<div class="dash-fridge-summary all-good">\u2713 All checks complete so far</div>';
-      else sumEl.innerHTML='';
-
-      // --- Room Audit ---
+      // ---- Gather room-audit data ----
       var scanH = getScanHistory(), scannedIds = new Set();
       var monISO = monday.toISOString(), sunISO = sunday.toISOString();
       for (var j=0;j<scanH.length;j++){
@@ -1194,15 +1261,66 @@
         else unscanned.push(EMBEDDED_ITEMS[m]);
       }
       var pct = total>0?Math.round(scanned/total*100):0;
-      document.getElementById('dashScanCount').textContent = scanned+' / '+total+' items';
+      var dow = today.getDay(); // 0=Sun … 4=Thu 5=Fri
+      var isThurPlus = dow>=4&&dow<=5;
+
+      // ---- Today: Audit status tile ----
+      var aEl = document.getElementById('statusAudit');
+      aEl.className = 'status-tile';
+      var aMain='', aDetail='', aClass='neutral';
+
+      if (scanned===total&&total>0){
+        aMain='\u2713 All '+total+' items scanned'; aDetail='Complete for this week'; aClass='good';
+      } else if (isThurPlus&&pct<50){
+        aMain='\u26a0 '+scanned+' / '+total+' ('+pct+'%)'; aDetail='Behind schedule \u2014 '+unscanned.length+' items remaining'; aClass='urgent';
+      } else if (pct>=50){
+        aMain=scanned+' / '+total+' items ('+pct+'%)'; aDetail=unscanned.length+' remaining this week'; aClass='good';
+      } else {
+        aMain=scanned+' / '+total+' items ('+pct+'%)'; aDetail=unscanned.length+' items still to scan'; aClass='neutral';
+      }
+      aEl.classList.add(aClass);
+      aEl.querySelector('.st-main').textContent = aMain;
+      aEl.querySelector('.st-detail').textContent = aDetail;
+
+      // ---- Weekly: Fridge rows ----
+      var dayLabels=['Mon','Tue','Wed','Thu','Fri'], html='', doneCount=0, missCount=0, pendCount=0;
+      for (var d=0;d<5;d++){
+        var dd = new Date(monday); dd.setDate(monday.getDate()+d);
+        var dateStr = fmtDDMMYYYY(dd), shortStr = fmtShortDate(dd);
+        var hol = isBankHoliday(dd), future = dd>today, isToday = dd.getTime()===today.getTime();
+        var dF1 = fridgeDatesF1.has(dateStr), dF2 = fridgeDatesF2.has(dateStr);
+        var done = dF1&&dF2, partial = (dF1||dF2)&&!done;
+        var cls,txt;
+        if (hol){ cls='holiday'; txt='Bank Holiday'; }
+        else if (done){ cls='done'; txt='\u2713 Both'; doneCount++; }
+        else if (partial&&!future&&!isToday){ cls='missing'; txt='\u26a0 '+(dF1?'F2':'F1')+' miss'; missCount++; }
+        else if (partial&&(isToday||future)){ cls='pending'; txt='\u2713 '+(dF1?'F1':'F2'); if(isToday) pendCount++; }
+        else if (isToday){ cls='pending'; txt='\u23f3 Pending'; pendCount++; }
+        else if (future){ cls='future'; txt='\u2014'; }
+        else { cls='missing'; txt='\u2717 Missing'; missCount++; }
+        html+='<div class="dash-week-row"><span class="day-label">'+dayLabels[d]+'</span>'+
+          '<span class="day-date">'+shortStr+'</span>'+
+          '<span class="day-status '+cls+'">'+txt+'</span></div>';
+      }
+      document.getElementById('dashFridgeBody').innerHTML = html;
+
+      var sumEl = document.getElementById('dashFridgeSummary');
+      if (missCount>0) sumEl.innerHTML='<div class="dash-fridge-summary has-issues">\u26a0 '+missCount+' missed day'+(missCount>1?'s':'')+'</div>';
+      else if (pendCount>0&&doneCount>0) sumEl.innerHTML='<div class="dash-fridge-summary all-pending">\u23f3 Today pending</div>';
+      else if (doneCount>0&&pendCount===0&&missCount===0) sumEl.innerHTML='<div class="dash-fridge-summary all-good">\u2713 All complete</div>';
+      else sumEl.innerHTML='';
+
+      // ---- Weekly: Room Audit progress ----
+      document.getElementById('dashScanCount').textContent = scanned+' / '+total;
       document.getElementById('dashScanPct').textContent = pct+'%';
       document.getElementById('dashScanBar').style.width = pct+'%';
 
       var uhtml='';
-      if (scanned===total && total>0){ uhtml='<div style="color:var(--accent);font-size:.9rem;margin-top:6px;font-weight:600">\u2713 All items scanned this week</div>'; }
-      else if (scanned>0 || total>0){
-        uhtml='<div style="font-size:.82rem;color:var(--muted);margin-top:8px;font-weight:600">Not yet scanned ('+unscanned.length+'):</div>';
-        for (var n=0;n<unscanned.length;n++) uhtml+='<div class="dash-unscanned-item">'+escapeHtml(unscanned[n].name)+' <span style="opacity:.6">('+escapeHtml(unscanned[n].room)+')</span></div>';
+      if (scanned===total&&total>0){
+        uhtml='<div style="color:var(--accent);font-size:.82rem;margin-top:4px;font-weight:600">\u2713 All scanned</div>';
+      } else if (total>0){
+        uhtml='<div style="font-size:.76rem;color:var(--muted);margin-top:6px;font-weight:600">Not yet scanned ('+unscanned.length+'):</div>';
+        for (var n=0;n<unscanned.length;n++) uhtml+='<div class="dash-unscanned-item">'+escapeHtml(unscanned[n].name)+' <span style="opacity:.55">('+escapeHtml(unscanned[n].room)+')</span></div>';
       }
       document.getElementById('dashScanUnscanned').innerHTML = uhtml;
     }
