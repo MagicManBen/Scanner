@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Scanner Audit</title>
+  <title>Nursing Team Checks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     :root {
       --bg: #0e0f11; --panel: #181a1e; --muted: #9aa0a6; --text: #e8eaed;
       --accent: #22c55e; --danger: #ef4444; --card: #111317; --line: #272a30;
-      --btn: #2a2f36;
+      --btn: #2a2f36; --blue: #3b82f6;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
       font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; }
     .hidden { display: none !important; }
 
-    /* Screens */
     .screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .screen.scroll-top { align-items: flex-start; }
     .panel { width: min(600px, 95vw); background: var(--panel); border-radius: 20px;
       padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,.35); text-align: center; }
     .panel.wide { width: min(900px, 96vw); }
@@ -26,7 +26,6 @@
     .muted { color: var(--muted); font-size: 14px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
-    /* Buttons */
     .btn { display: inline-flex; justify-content: center; align-items: center;
       padding: 14px 24px; border-radius: 14px; background: var(--btn);
       border: 1px solid var(--line); color: var(--text); cursor: pointer;
@@ -44,11 +43,27 @@
       60%  { box-shadow: 0 0 36px 26px rgba(34,197,94,0); }
       100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
     }
+    .btn.secondary { background: var(--btn); border: 1px solid var(--line); color: var(--text);
+      font-size: 0.95rem; padding: 10px 18px; }
+    .btn.secondary::after { display: none; }
+    .btn.danger-sm { background: transparent; border: 1px solid var(--danger); color: var(--danger);
+      font-size: 0.85rem; padding: 8px 14px; }
+    .btn.danger-sm::after { display: none; }
+    .btn.blue-primary { background: var(--blue); border-color: transparent;
+      color: #fff; font-weight: 700;
+      box-shadow: 0 10px 30px rgba(59,130,246,.4); }
+    .btn.blue-primary::after { content: ""; position: absolute; inset: -10px;
+      border-radius: 18px; pointer-events: none;
+      box-shadow: 0 0 0 0 rgba(59,130,246,.6);
+      animation: btnPulseBlue 1.8s ease-in-out infinite; }
+    @keyframes btnPulseBlue {
+      0%   { box-shadow: 0 0 0 0 rgba(59,130,246,.6); }
+      60%  { box-shadow: 0 0 36px 26px rgba(59,130,246,0); }
+      100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+    }
 
-    /* Glowing text */
     .glow { text-shadow: 0 2px 0 rgba(0,0,0,.6), 0 0 18px rgba(255,255,255,.35); }
 
-    /* QR wrapper */
     .qr-wrap { display: inline-block; padding: 14px; border-radius: 16px;
       background: var(--card); margin: 16px auto;
       box-shadow: 0 0 16px rgba(34,197,94,.3), inset 0 0 18px rgba(34,197,94,.15);
@@ -58,34 +73,9 @@
       50%      { box-shadow: 0 0 28px rgba(34,197,94,.5), inset 0 0 26px rgba(34,197,94,.25); transform: scale(1.03); }
     }
 
-    /* Audit ring animation */
     .audit-hero { display: flex; flex-direction: column; align-items: center;
       justify-content: center; gap: 24px; min-height: 80vh; }
-    .audit-ring { position: relative; width: min(70vw, 350px); height: min(70vw, 350px);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .audit-ring:before, .audit-ring:after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
-    .audit-ring:before { border: 6px solid #1e8c1e;
-      box-shadow: inset 0 0 40px rgba(30,140,30,.35), 0 0 26px rgba(30,140,30,.25);
-      animation: pulseExpand 1.6s ease-in-out infinite; }
-    .audit-ring:after { inset: -10px;
-      box-shadow: 0 0 0 0 rgba(30,140,30,.5);
-      animation: ripple 1.6s ease-out infinite; }
-    .audit-title { position: absolute; text-align: center; padding: 0 24px; z-index: 5; }
-    .audit-title .big { font-size: clamp(1.6rem, 3.8vw, 2.2rem); font-weight: 900;
-      text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-    .audit-title .sub { margin-top: 8px; font-size: clamp(1rem, 2.4vw, 1.15rem);
-      color: #d3ffd3; line-height: 1.4; }
-    @keyframes pulseExpand {
-      0%   { transform: scale(.95); }
-      50%  { transform: scale(1.05); }
-      100% { transform: scale(.95); }
-    }
-    @keyframes ripple {
-      0%   { box-shadow: 0 0 0 0 rgba(30,140,30,.5); opacity: 1; }
-      100% { box-shadow: 0 0 0 24px rgba(30,140,30,0); opacity: 0; }
-    }
 
-    /* Upload counter */
     .upload-counter { position: relative; width: 200px; height: 200px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; margin: 16px auto; }
     .upload-counter:before { content: ""; position: absolute; inset: 0; border-radius: 50%;
@@ -99,8 +89,9 @@
       color: #d3ffd3; text-shadow: 0 2px 10px rgba(0,0,0,.6); position: relative; z-index: 5; }
     .upload-counter .sub { font-size: clamp(.9rem, 2vw, 1rem); color: #b8f5b8;
       position: relative; z-index: 5; }
+    @keyframes pulseExpand { 0% { transform: scale(.95); } 50% { transform: scale(1.05); } 100% { transform: scale(.95); } }
+    @keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(30,140,30,.5); opacity:1; } 100% { box-shadow: 0 0 0 24px rgba(30,140,30,0); opacity:0; } }
 
-    /* Results */
     .room-group { border: 1px solid var(--line); border-radius: 14px;
       background: linear-gradient(180deg, #111317, #0f1216); overflow: clip; margin-bottom: 12px; }
     .room-group[open] { box-shadow: 0 0 0 1px rgba(34,197,94,.2), 0 8px 22px rgba(0,0,0,.35); }
@@ -120,13 +111,12 @@
     .item-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center;
       gap: 12px; padding: 12px; border: 1px solid #2a2f36; border-radius: 12px;
       background: #0f1216; text-align: left; animation: itemIn .25s ease both; }
-    @keyframes itemIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @keyframes itemIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
     .item-card .item-id { font-family: ui-monospace, monospace; font-size: 13px; color: var(--muted); }
     .item-card .item-name { font-weight: 600; }
     .match-ok { color: var(--accent); font-size: 20px; }
     .match-fail { color: var(--danger); font-size: 16px; font-weight: 600; }
 
-    /* Stats */
     .stats { display: flex; gap: 12px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
     .stat { padding: 10px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
     .stat .label { font-size: 12px; color: var(--muted); }
@@ -134,60 +124,35 @@
     .stat.ok .value { color: var(--accent); }
     .stat.fail .value { color: var(--danger); }
 
-    /* Toast */
     .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 28px;
       background: #0f1216; border: 1px solid var(--line); padding: 10px 14px;
       border-radius: 10px; color: #fff; z-index: 100; }
 
-    /* Scrollable results */
     .results-scroll { max-height: 50vh; overflow: auto; margin: 12px 0; text-align: left; }
 
-    /* Setup screen image */
     .setup-img-wrap { position: relative; width: min(300px, 60vw); height: min(300px, 60vw); margin: 20px auto; }
-    .setup-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
-      transition: opacity .3s ease; }
+    .setup-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity .3s ease; }
     .setup-img-wrap img.frame-hidden { opacity: 0; }
     .setup-img-wrap img.frame-visible { opacity: 1; }
-
-    /* Wristband image */
     .wristband-img { width: min(220px, 50vw); margin: 16px auto; display: block; }
-
-    /* ScanTrolly animation */
-    .trolly-img-wrap { position: relative; width: min(70vw, 350px); height: min(70vw, 350px);
-      margin: 0 auto; }
-    .trolly-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
-      transition: opacity .3s ease; }
+    .trolly-img-wrap { position: relative; width: min(70vw, 350px); height: min(70vw, 350px); margin: 0 auto; }
+    .trolly-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity .3s ease; }
     .trolly-img-wrap img.frame-hidden { opacity: 0; }
     .trolly-img-wrap img.frame-visible { opacity: 1; }
 
-    /* History bar on start screen */
-    .history-bar { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
-    .history-bar .row { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
-    .history-badge { display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
-      font-size: 13px; background: #1e232b; color: var(--muted); }
-    .btn.secondary { background: var(--btn); border: 1px solid var(--line); color: var(--text);
-      font-size: 0.95rem; padding: 10px 18px; }
-    .btn.secondary::after { display: none; }
-    .btn.danger-sm { background: transparent; border: 1px solid var(--danger); color: var(--danger);
-      font-size: 0.85rem; padding: 8px 14px; }
-    .btn.danger-sm::after { display: none; }
-
-    /* Home menu cards */
     .menu-grid { display: grid; gap: 16px; margin-top: 24px; }
     .menu-card { display: flex; align-items: center; gap: 16px; padding: 20px;
       border: 1px solid var(--line); border-radius: 16px; background: var(--card);
       cursor: pointer; text-align: left; transition: border-color .2s, box-shadow .2s; }
     .menu-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(34,197,94,.15); }
+    .menu-card.blue:hover { border-color: var(--blue); box-shadow: 0 0 20px rgba(59,130,246,.15); }
     .menu-icon { font-size: 2rem; width: 52px; height: 52px; display: flex; align-items: center;
-      justify-content: center; border-radius: 14px; background: rgba(34,197,94,.1);
-      flex-shrink: 0; }
+      justify-content: center; border-radius: 14px; background: rgba(34,197,94,.1); flex-shrink: 0; }
+    .menu-icon.blue-bg { background: rgba(59,130,246,.1); }
     .menu-card .menu-label { font-size: 1.15rem; font-weight: 700; }
     .menu-card .menu-desc { font-size: .85rem; color: var(--muted); margin-top: 2px; }
 
-    /* Calendar */
-    .cal-nav { display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .cal-nav .cal-title { font-size: 1.15rem; font-weight: 700; }
     .cal-nav button { background: var(--btn); border: 1px solid var(--line); color: var(--text);
       border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 1rem; }
@@ -200,65 +165,112 @@
       cursor: pointer; font-weight: 700; border: 1px solid rgba(34,197,94,.25); }
     .cal-grid .cal-day.has-audit:hover { background: rgba(34,197,94,.25); }
     .cal-grid .cal-day .cal-dot { position: absolute; bottom: 4px; left: 50%;
-      transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); }
+      transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .cal-grid .cal-day .cal-dot.blue { background: var(--blue); }
+    .cal-grid .cal-day.has-fridge { background: rgba(59,130,246,.12); color: var(--text);
+      cursor: pointer; font-weight: 700; border: 1px solid rgba(59,130,246,.25); }
+    .cal-grid .cal-day.has-fridge:hover { background: rgba(59,130,246,.25); }
+    .cal-grid .cal-day.has-both { background: linear-gradient(135deg, rgba(34,197,94,.15), rgba(59,130,246,.15));
+      color: var(--text); cursor: pointer; font-weight: 700;
+      border: 1px solid rgba(34,197,94,.25); }
+    .cal-grid .cal-day.has-both:hover { background: linear-gradient(135deg, rgba(34,197,94,.25), rgba(59,130,246,.25)); }
     .cal-grid .cal-day.today { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 10px; }
 
-    /* Audit list on a day */
     .audit-list { margin-top: 16px; text-align: left; }
     .audit-list-item { display: flex; align-items: center; justify-content: space-between;
       padding: 14px; border: 1px solid var(--line); border-radius: 12px;
-      background: var(--card); margin-bottom: 8px; cursor: pointer;
-      transition: border-color .2s; }
+      background: var(--card); margin-bottom: 8px; cursor: pointer; transition: border-color .2s; }
     .audit-list-item:hover { border-color: var(--accent); }
+    .audit-list-item.fridge-item:hover { border-color: var(--blue); }
     .audit-list-item .ali-time { font-weight: 700; font-size: 1rem; }
     .audit-list-item .ali-count { font-size: .85rem; color: var(--muted); }
     .audit-list-item .ali-arrow { color: var(--muted); font-size: 1.2rem; }
+    .ali-type { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: .7rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-right: 8px; }
+    .ali-type.scan { background: rgba(34,197,94,.15); color: var(--accent); }
+    .ali-type.fridge { background: rgba(59,130,246,.15); color: var(--blue); }
 
-    /* Detail back link */
     .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent);
       cursor: pointer; font-size: .95rem; font-weight: 600; margin-bottom: 16px;
       background: none; border: none; padding: 0; }
     .back-link:hover { text-decoration: underline; }
 
-    /* Screen scroll override for dashboard */
-    .screen.scroll-top { align-items: flex-start; }
+    .form-group { text-align: left; margin-bottom: 20px; }
+    .form-group label.field-label { display: block; font-weight: 600; margin-bottom: 6px; font-size: .95rem; }
+    .form-group .req { color: var(--danger); }
+    .form-group input[type=date], .form-group input[type=number], .form-group textarea, .form-group select {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+      background: var(--card); color: var(--text); font-size: 1rem; font-family: inherit; }
+    .form-group input[type=date]:focus, .form-group input[type=number]:focus,
+    .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.2); }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .radio-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-opt { display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+      cursor: pointer; transition: border-color .2s; }
+    .radio-opt:hover { border-color: var(--blue); }
+    .radio-opt input[type=radio] { accent-color: var(--blue); width: 18px; height: 18px; cursor: pointer; }
+    .radio-opt span { font-size: .95rem; }
+    .radio-opt.selected { border-color: var(--blue); background: rgba(59,130,246,.08); }
+    .form-error { color: var(--danger); font-size: .85rem; margin-top: 4px; display: none; }
+
+    .fridge-detail-grid { display: grid; gap: 12px; text-align: left; }
+    .fd-row { display: flex; justify-content: space-between; align-items: center;
+      padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+    .fd-label { color: var(--muted); font-size: .9rem; }
+    .fd-value { font-weight: 700; font-size: 1.05rem; }
+
+    .tab-row { display: flex; gap: 8px; margin-bottom: 16px; justify-content: center; }
+    .tab-btn { padding: 8px 20px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--card); color: var(--muted); cursor: pointer; font-size: .9rem; font-weight: 600; }
+    .tab-btn.active { background: var(--accent); color: #04130a; border-color: transparent; }
+    .tab-btn.active-blue { background: var(--blue); color: #fff; border-color: transparent; }
+
+    .cal-legend { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
+    .cal-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .cal-legend-dot.green { background: var(--accent); }
+    .cal-legend-dot.blue-dot { background: var(--blue); }
   </style>
 </head>
 <body>
 
-  <!-- ========== HOME ========== -->
+  <!-- HOME -->
   <div class="screen" id="screen-home">
     <div class="panel">
-      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
+      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Nursing Team Checks</h1>
       <p class="muted" style="font-size:1.05rem">Choose an option to get started</p>
       <div class="menu-grid">
         <div class="menu-card" id="menuScan">
           <div class="menu-icon">&#128225;</div>
-          <div><div class="menu-label">Start Scanning</div>
-          <div class="menu-desc">Connect scanner &amp; begin a new audit</div></div>
+          <div><div class="menu-label">Room Audit</div>
+          <div class="menu-desc">Connect scanner &amp; begin a room audit</div></div>
+        </div>
+        <div class="menu-card blue" id="menuFridge">
+          <div class="menu-icon blue-bg">&#127777;</div>
+          <div><div class="menu-label">Fridge Temp Check</div>
+          <div class="menu-desc">Log medicines storage temperatures</div></div>
         </div>
         <div class="menu-card" id="menuDashboard">
           <div class="menu-icon">&#128197;</div>
-          <div><div class="menu-label">Audit History</div>
-          <div class="menu-desc">Calendar view of past submissions</div></div>
+          <div><div class="menu-label">History &amp; Calendar</div>
+          <div class="menu-desc">View all past submissions</div></div>
         </div>
         <div class="menu-card" id="menuDownload">
           <div class="menu-icon">&#128190;</div>
-          <div><div class="menu-label">Download CSV</div>
-          <div class="menu-desc">Export all submissions as SUBMISSIONS.csv</div></div>
+          <div><div class="menu-label">Download Excel</div>
+          <div class="menu-desc">Export all records as .xlsx workbook</div></div>
         </div>
-      </div>
-      <div style="margin-top:20px">
-        <span class="history-badge" id="homeBadge">0 audits saved</span>
       </div>
     </div>
   </div>
 
-  <!-- ========== SCREEN 0: SETUP / CONNECT ========== -->
+  <!-- SCANNER: SETUP -->
   <div class="screen hidden" id="screen-setup">
     <div class="panel">
-      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
+      <button class="back-link" id="setupBack">&larr; Home</button>
+      <h1 class="glow" style="font-size:clamp(1.6rem,4vw,2rem)">Room Audit</h1>
       <p class="muted" style="font-size:1.1rem; margin-bottom:8px">
         Click the button on your scanner to connect
       </p>
@@ -274,10 +286,10 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 1: CLEAR & START ========== -->
+  <!-- SCANNER: CLEAR & START -->
   <div class="screen hidden" id="screen-start">
     <div class="panel">
-      <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Scanner Audit</h1>
+      <h1 class="glow" style="font-size:clamp(1.6rem,4vw,2rem)">Room Audit</h1>
       <p class="muted" style="font-size:1.1rem; margin-bottom:20px">
         Point your handheld scanner at this QR code to clear previous data
       </p>
@@ -294,7 +306,7 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 2: AUDIT IN PROGRESS ========== -->
+  <!-- SCANNER: AUDIT IN PROGRESS -->
   <div class="screen hidden" id="screen-audit">
     <div class="audit-hero">
       <div class="trolly-img-wrap" aria-hidden="true">
@@ -310,7 +322,7 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 3: UPLOAD ========== -->
+  <!-- SCANNER: UPLOAD -->
   <div class="screen hidden" id="screen-upload">
     <div class="panel">
       <h2 class="glow">Upload Scans</h2>
@@ -330,41 +342,91 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 4: RESULTS ========== -->
+  <!-- SCANNER: RESULTS -->
   <div class="screen hidden" id="screen-results">
     <div class="panel wide">
       <h2 class="glow" style="margin-bottom:4px">Scanned Items</h2>
       <div class="stats">
-        <div class="stat ok">
-          <div class="label">Matched</div>
-          <div class="value" id="matchCount">0</div>
-        </div>
-        <div class="stat fail">
-          <div class="label">Unknown</div>
-          <div class="value" id="unknownCount">0</div>
-        </div>
-        <div class="stat">
-          <div class="label">Total</div>
-          <div class="value" id="totalCount">0</div>
-        </div>
+        <div class="stat ok"><div class="label">Matched</div><div class="value" id="matchCount">0</div></div>
+        <div class="stat fail"><div class="label">Unknown</div><div class="value" id="unknownCount">0</div></div>
+        <div class="stat"><div class="label">Total</div><div class="value" id="totalCount">0</div></div>
       </div>
       <div class="results-scroll" id="resultsBody"></div>
       <div style="margin-top:16px">
-        <button class="btn primary" id="btnConfirm" style="padding:16px 40px; font-size:1.15rem">
-          Confirm &#10003;
-        </button>
+        <button class="btn primary" id="btnConfirm" style="padding:16px 40px; font-size:1.15rem">Confirm &#10003;</button>
       </div>
     </div>
   </div>
 
+  <!-- FRIDGE TEMP FORM -->
+  <div class="screen scroll-top hidden" id="screen-fridge">
+    <div class="panel">
+      <button class="back-link" id="fridgeBack">&larr; Home</button>
+      <h2 class="glow" style="margin-bottom:4px">Medicines Storage Temp Check</h2>
+      <p class="muted" style="margin-bottom:20px">Complete all required fields</p>
+      <form id="fridgeForm" autocomplete="off">
+        <div class="form-group">
+          <label class="field-label">Date of Check <span class="req">*</span></label>
+          <input type="date" id="fDate" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Current Temperature (&deg;C) <span class="req">*</span></label>
+          <input type="number" step="0.1" id="fCurrent" placeholder="e.g. 4.5" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Min Temperature (&deg;C) <span class="req">*</span></label>
+          <input type="number" step="0.1" id="fMin" placeholder="e.g. 2.0" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Max Temperature (&deg;C) <span class="req">*</span></label>
+          <input type="number" step="0.1" id="fMax" placeholder="e.g. 8.0" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Thermometer Reset? <span class="req">*</span></label>
+          <div class="radio-group" id="fResetGroup">
+            <label class="radio-opt"><input type="radio" name="fReset" value="Yes"><span>Yes</span></label>
+            <label class="radio-opt"><input type="radio" name="fReset" value="No"><span>No</span></label>
+          </div>
+          <div class="form-error" id="fResetError">Please select an option</div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Comments</label>
+          <textarea id="fComments" rows="2" placeholder="Optional comments"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Checked by <span class="req">*</span></label>
+          <div class="radio-group" id="fCheckedGroup">
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Alexa"><span>Alexa</span></label>
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Sarah"><span>Sarah</span></label>
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Rabia"><span>Rabia</span></label>
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Diana"><span>Diana</span></label>
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Kelly M"><span>Kelly M</span></label>
+            <label class="radio-opt"><input type="radio" name="fChecked" value="Kelly A"><span>Kelly A</span></label>
+          </div>
+          <div class="form-error" id="fCheckedError">Please select who checked</div>
+        </div>
+        <div style="margin-top:24px">
+          <button type="submit" class="btn blue-primary" style="padding:16px 40px; font-size:1.15rem; width:100%;">Submit Check &#10003;</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-
-  <!-- ========== DASHBOARD ========== -->
+  <!-- DASHBOARD / CALENDAR -->
   <div class="screen scroll-top hidden" id="screen-dashboard">
     <div class="panel wide">
       <button class="back-link" id="dashBack">&larr; Home</button>
-      <h2 class="glow" style="margin-bottom:4px">Audit History</h2>
-      <p class="muted" style="margin-bottom:16px">Tap a highlighted day to see audits</p>
+      <h2 class="glow" style="margin-bottom:4px">History &amp; Calendar</h2>
+      <p class="muted" style="margin-bottom:12px">Tap a highlighted day to see submissions</p>
+      <div class="tab-row">
+        <button class="tab-btn active" id="tabAll">All</button>
+        <button class="tab-btn" id="tabScans">Room Audits</button>
+        <button class="tab-btn" id="tabFridge">Fridge Checks</button>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-legend-dot green"></span> Room Audit</div>
+        <div class="cal-legend-item"><span class="cal-legend-dot blue-dot"></span> Fridge Check</div>
+      </div>
       <div class="cal-nav">
         <button id="calPrev">&lsaquo;</button>
         <span class="cal-title" id="calTitle"></span>
@@ -375,24 +437,15 @@
     </div>
   </div>
 
-  <!-- ========== AUDIT DETAIL ========== -->
+  <!-- ROOM AUDIT DETAIL -->
   <div class="screen scroll-top hidden" id="screen-detail">
     <div class="panel wide">
       <button class="back-link" id="detailBack">&larr; Back to Calendar</button>
       <h2 class="glow" id="detailTitle">Audit Detail</h2>
       <div class="stats">
-        <div class="stat ok">
-          <div class="label">Matched</div>
-          <div class="value" id="detailMatched">0</div>
-        </div>
-        <div class="stat fail">
-          <div class="label">Unknown</div>
-          <div class="value" id="detailUnknown">0</div>
-        </div>
-        <div class="stat">
-          <div class="label">Total</div>
-          <div class="value" id="detailTotal">0</div>
-        </div>
+        <div class="stat ok"><div class="label">Matched</div><div class="value" id="detailMatched">0</div></div>
+        <div class="stat fail"><div class="label">Unknown</div><div class="value" id="detailUnknown">0</div></div>
+        <div class="stat"><div class="label">Total</div><div class="value" id="detailTotal">0</div></div>
       </div>
       <div class="results-scroll" id="detailBody"></div>
       <div style="margin-top:24px; text-align:center;">
@@ -401,21 +454,32 @@
     </div>
   </div>
 
-  <!-- Hidden input for scanner keyboard-wedge capture -->
+  <!-- FRIDGE DETAIL -->
+  <div class="screen scroll-top hidden" id="screen-fridge-detail">
+    <div class="panel">
+      <button class="back-link" id="fridgeDetailBack">&larr; Back to Calendar</button>
+      <h2 class="glow" id="fridgeDetailTitle">Fridge Check Detail</h2>
+      <div class="fridge-detail-grid" id="fridgeDetailBody"></div>
+      <div style="margin-top:24px; text-align:center;">
+        <button class="btn danger-sm" id="btnDeleteFridge">Delete This Check</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden input for scanner -->
   <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false"
          inputmode="none" aria-hidden="true"
          style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
 
   <div id="toast" class="toast hidden"></div>
 
-  <!-- QRCode.js from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
   (function(){
     'use strict';
 
-    // ===== ITEM DATABASE =====
-    // Embedded from List_Items.csv (also tries to load CSV dynamically on init)
+    /* ===== ITEM DATABASE ===== */
     var EMBEDDED_ITEMS = [
       { id:"8500753764", name:"Baby Immunisations Fridge", room:"Room 6" },
       { id:"5695683887", name:"Black Small Oxygen Tank", room:"Reception Back Office" },
@@ -449,9 +513,7 @@
       { id:"5014957608", name:"Stock Room", room:"Stock Room" }
     ];
 
-    // Lookup map: barcode ID (string) -> { name, room }
     var ITEMS = new Map();
-
     function loadEmbeddedItems(){
       ITEMS.clear();
       for (var i = 0; i < EMBEDDED_ITEMS.length; i++){
@@ -460,7 +522,6 @@
       }
     }
 
-    // Simple CSV line parser handling quoted fields with escaped double-quotes
     function parseCSVLine(line){
       var fields = [], i = 0;
       while (i < line.length){
@@ -468,7 +529,7 @@
           var field = ''; i++;
           while (i < line.length){
             if (line[i] === '"'){
-              if (i + 1 < line.length && line[i + 1] === '"'){ field += '"'; i += 2; }
+              if (i+1 < line.length && line[i+1] === '"'){ field += '"'; i += 2; }
               else { i++; break; }
             } else { field += line[i]; i++; }
           }
@@ -487,11 +548,9 @@
     }
 
     function cleanRoom(raw){
-      return (raw || '').replace(/^\[/, '').replace(/\]$/, '')
-        .replace(/^"/, '').replace(/"$/, '').trim() || 'Unassigned';
+      return (raw||'').replace(/^\[/,'').replace(/\]$/,'').replace(/^"/,'').replace(/"$/,'').trim()||'Unassigned';
     }
 
-    // Try to load items from CSV file (works when served over HTTP)
     async function tryLoadCSV(){
       try {
         var res = await fetch('List_Items.csv');
@@ -503,99 +562,56 @@
         for (var i = 1; i < lines.length; i++){
           var fields = parseCSVLine(lines[i]);
           if (fields.length < 3) continue;
-          var id = fields[0].trim();
-          var name = fields[1].trim();
-          var room = cleanRoom(fields[2]);
-          if (/^\d{10}$/.test(id)){
-            loaded.set(id, { name: name, room: room });
-          }
+          var id = fields[0].trim(), name = fields[1].trim(), room = cleanRoom(fields[2]);
+          if (/^\d{10}$/.test(id)) loaded.set(id, { name: name, room: room });
         }
         if (loaded.size > 0){ ITEMS = loaded; return true; }
-      } catch(e){ /* fetch not available (file:// protocol) - use embedded data */ }
+      } catch(e){}
       return false;
     }
 
 
-    // ===== SCREEN NAVIGATION =====
-    var SCREENS = ['screen-home','screen-setup','screen-start','screen-audit','screen-upload','screen-results','screen-dashboard','screen-detail'];
+    /* ===== SCREEN NAV ===== */
+    var SCREENS = ['screen-home','screen-setup','screen-start','screen-audit','screen-upload',
+      'screen-results','screen-fridge','screen-dashboard','screen-detail','screen-fridge-detail'];
     var currentScreen = 'screen-home';
 
-    // ===== IMAGE ANIMATIONS =====
-    var ddAnimTimer = null;
-    var stAnimTimer = null;
-
+    var ddAnimTimer = null, stAnimTimer = null;
     function startDoubleDeepAnim(){
       if (ddAnimTimer) return;
-      var f1 = document.getElementById('ddFrame1');
-      var f2 = document.getElementById('ddFrame2');
-      var toggle = false;
-      ddAnimTimer = setInterval(function(){
-        toggle = !toggle;
-        f1.className = toggle ? 'frame-hidden' : 'frame-visible';
-        f2.className = toggle ? 'frame-visible' : 'frame-hidden';
-      }, 1000);
+      var f1 = document.getElementById('ddFrame1'), f2 = document.getElementById('ddFrame2'), t = false;
+      ddAnimTimer = setInterval(function(){ t=!t; f1.className=t?'frame-hidden':'frame-visible'; f2.className=t?'frame-visible':'frame-hidden'; }, 1000);
     }
-
-    function stopDoubleDeepAnim(){
-      if (ddAnimTimer){ clearInterval(ddAnimTimer); ddAnimTimer = null; }
-    }
-
+    function stopDoubleDeepAnim(){ if (ddAnimTimer){ clearInterval(ddAnimTimer); ddAnimTimer=null; } }
     function startScanTrollyAnim(){
       if (stAnimTimer) return;
-      var f1 = document.getElementById('stFrame1');
-      var f2 = document.getElementById('stFrame2');
-      var toggle = false;
-      stAnimTimer = setInterval(function(){
-        toggle = !toggle;
-        f1.className = toggle ? 'frame-hidden' : 'frame-visible';
-        f2.className = toggle ? 'frame-visible' : 'frame-hidden';
-      }, 1000);
+      var f1 = document.getElementById('stFrame1'), f2 = document.getElementById('stFrame2'), t = false;
+      stAnimTimer = setInterval(function(){ t=!t; f1.className=t?'frame-hidden':'frame-visible'; f2.className=t?'frame-visible':'frame-hidden'; }, 1000);
     }
-
-    function stopScanTrollyAnim(){
-      if (stAnimTimer){ clearInterval(stAnimTimer); stAnimTimer = null; }
-    }
+    function stopScanTrollyAnim(){ if (stAnimTimer){ clearInterval(stAnimTimer); stAnimTimer=null; } }
 
     function show(id){
-      for (var i = 0; i < SCREENS.length; i++){
-        document.getElementById(SCREENS[i]).classList.add('hidden');
-      }
+      for (var i = 0; i < SCREENS.length; i++) document.getElementById(SCREENS[i]).classList.add('hidden');
       document.getElementById(id).classList.remove('hidden');
       currentScreen = id;
-      if (id === 'screen-upload') startFocusLoop();
-      else stopFocusLoop();
-
-      // Manage animations
-      if (id === 'screen-setup') startDoubleDeepAnim();
-      else stopDoubleDeepAnim();
-      if (id === 'screen-audit') startScanTrollyAnim();
-      else stopScanTrollyAnim();
+      if (id === 'screen-upload') startFocusLoop(); else stopFocusLoop();
+      if (id === 'screen-setup') startDoubleDeepAnim(); else stopDoubleDeepAnim();
+      if (id === 'screen-audit') startScanTrollyAnim(); else stopScanTrollyAnim();
+      window.scrollTo(0,0);
     }
 
 
-    // ===== QR CODES =====
+    /* ===== QR CODES ===== */
     function renderQR(elementId, text){
-      var el = document.getElementById(elementId);
-      if (!el) return;
-      el.innerHTML = '';
-      if (typeof QRCode !== 'undefined'){
-        new QRCode(el, { text: text, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
-      } else {
-        el.textContent = text;
-      }
+      var el = document.getElementById(elementId); if (!el) return; el.innerHTML = '';
+      if (typeof QRCode !== 'undefined') new QRCode(el, { text: text, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+      else el.textContent = text;
     }
 
 
-    // ===== SCANNER CAPTURE =====
-    var scans = [];
-    var uploadQuietTimer = null;
-    var focusTimer = null;
-
-    function focusInput(){
-      var el = document.getElementById('hiddenInput');
-      if (el){ el.value = ''; el.focus(); }
-    }
-
+    /* ===== SCANNER CAPTURE ===== */
+    var scans = [], uploadQuietTimer = null, focusTimer = null;
+    function focusInput(){ var el = document.getElementById('hiddenInput'); if (el){ el.value=''; el.focus(); } }
     function startFocusLoop(){
       focusInput();
       if (focusTimer) clearInterval(focusTimer);
@@ -605,37 +621,20 @@
         if (el && document.activeElement !== el) el.focus();
       }, 250);
       var inp = document.getElementById('hiddenInput');
-      if (inp) inp.onblur = function(){
-        if (currentScreen === 'screen-upload') setTimeout(focusInput, 0);
-      };
+      if (inp) inp.onblur = function(){ if (currentScreen === 'screen-upload') setTimeout(focusInput, 0); };
     }
-
     function stopFocusLoop(){
-      if (focusTimer){ clearInterval(focusTimer); focusTimer = null; }
+      if (focusTimer){ clearInterval(focusTimer); focusTimer=null; }
       var inp = document.getElementById('hiddenInput');
-      if (inp){ inp.onblur = null; inp.blur(); }
+      if (inp){ inp.onblur=null; inp.blur(); }
     }
-
-    // Re-focus on visibility / window events (iPad compatibility)
-    document.addEventListener('visibilitychange', function(){
-      if (document.visibilityState === 'visible' && currentScreen === 'screen-upload') focusInput();
-    });
-    window.addEventListener('focus', function(){
-      if (currentScreen === 'screen-upload') focusInput();
-    });
-    window.addEventListener('pageshow', function(){
-      if (currentScreen === 'screen-upload') focusInput();
-    });
-    document.addEventListener('pointerdown', function(){
-      if (currentScreen === 'screen-upload') focusInput();
-    }, true);
+    document.addEventListener('visibilitychange', function(){ if (document.visibilityState==='visible' && currentScreen==='screen-upload') focusInput(); });
+    window.addEventListener('focus', function(){ if (currentScreen==='screen-upload') focusInput(); });
+    window.addEventListener('pageshow', function(){ if (currentScreen==='screen-upload') focusInput(); });
+    document.addEventListener('pointerdown', function(){ if (currentScreen==='screen-upload') focusInput(); }, true);
     document.addEventListener('focusin', function(e){
-      if (currentScreen === 'screen-upload'){
-        var el = document.getElementById('hiddenInput');
-        if (el && e.target !== el) el.focus();
-      }
+      if (currentScreen==='screen-upload'){ var el=document.getElementById('hiddenInput'); if (el && e.target!==el) el.focus(); }
     }, true);
-
 
     function handleScanInput(raw){
       var m = raw.match(/^\d{10}$/);
@@ -652,462 +651,488 @@
       }
       scheduleAutoAdvance();
     }
-
     function scheduleAutoAdvance(){
       if (uploadQuietTimer) clearTimeout(uploadQuietTimer);
       uploadQuietTimer = setTimeout(function(){ showResults(); }, 2000);
     }
-
     document.getElementById('hiddenInput').addEventListener('keydown', function(e){
-      if (e.key !== 'Enter') return;
-      e.preventDefault();
-      var raw = e.target.value.trim();
-      e.target.value = '';
+      if (e.key !== 'Enter') return; e.preventDefault();
+      var raw = e.target.value.trim(); e.target.value = '';
       if (currentScreen === 'screen-upload') handleScanInput(raw);
     });
 
 
-    // ===== RESULTS =====
+    /* ===== RESULTS ===== */
     function escapeHtml(str){
       if (!str) return '';
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
+      var div = document.createElement('div'); div.appendChild(document.createTextNode(str)); return div.innerHTML;
     }
 
     function showResults(){
       var matched = [], unknown = [];
       for (var i = 0; i < scans.length; i++){
-        var code = scans[i];
-        var item = ITEMS.get(code);
-        if (item) matched.push({ code: code, name: item.name, room: item.room });
-        else unknown.push({ code: code });
+        var code = scans[i], item = ITEMS.get(code);
+        if (item) matched.push({ code:code, name:item.name, room:item.room });
+        else unknown.push({ code:code });
       }
-
       document.getElementById('matchCount').textContent = String(matched.length);
       document.getElementById('unknownCount').textContent = String(unknown.length);
       document.getElementById('totalCount').textContent = String(scans.length);
 
-      // Group matched items by room
       var groups = new Map();
       for (var j = 0; j < matched.length; j++){
         var room = matched[j].room || 'Unassigned';
         if (!groups.has(room)) groups.set(room, []);
         groups.get(room).push(matched[j]);
       }
-      if (unknown.length > 0){
-        groups.set('Unknown / Not in database', unknown.map(function(u){
-          return { code: u.code, name: null, room: null };
-        }));
-      }
+      if (unknown.length > 0) groups.set('Unknown / Not in database', unknown.map(function(u){ return { code:u.code, name:null, room:null }; }));
 
-      var container = document.getElementById('resultsBody');
-      container.innerHTML = '';
-
+      var container = document.getElementById('resultsBody'); container.innerHTML = '';
       if (scans.length === 0){
         container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No items were scanned.</p>';
-        show('screen-results');
-        return;
+        show('screen-results'); return;
       }
-
       groups.forEach(function(items, room){
-        var details = document.createElement('details');
-        details.className = 'room-group';
-        details.setAttribute('open', 'open');
-
+        var details = document.createElement('details'); details.className = 'room-group'; details.setAttribute('open','open');
         var isUnknown = room === 'Unknown / Not in database';
         var summary = document.createElement('summary');
-        summary.innerHTML =
-          '<div class="room-badge">' +
-            '<span class="room-dot' + (isUnknown ? ' unknown' : '') + '"></span>' +
-            '<span>' + escapeHtml(room) + '</span>' +
-          '</div>' +
-          '<span class="room-count">' + items.length + ' item' + (items.length !== 1 ? 's' : '') + '</span>';
+        summary.innerHTML = '<div class="room-badge"><span class="room-dot'+(isUnknown?' unknown':'')+'"></span><span>'+escapeHtml(room)+'</span></div><span class="room-count">'+items.length+' item'+(items.length!==1?'s':'')+'</span>';
         details.appendChild(summary);
-
-        var wrap = document.createElement('div');
-        wrap.className = 'group-items';
-
+        var wrap = document.createElement('div'); wrap.className = 'group-items';
         for (var k = 0; k < items.length; k++){
-          var it = items[k];
-          var card = document.createElement('div');
-          card.className = 'item-card';
-          card.innerHTML =
-            '<span class="item-id mono">' + escapeHtml(it.code) + '</span>' +
-            '<span class="item-name">' + escapeHtml(it.name || '(Unknown item)') + '</span>' +
-            '<span class="' + (it.name ? 'match-ok' : 'match-fail') + '">' +
-              (it.name ? '\u2713' : '?') +
-            '</span>';
+          var it = items[k], card = document.createElement('div'); card.className = 'item-card';
+          card.innerHTML = '<span class="item-id mono">'+escapeHtml(it.code)+'</span><span class="item-name">'+escapeHtml(it.name||'(Unknown item)')+'</span><span class="'+(it.name?'match-ok':'match-fail')+'">'+(it.name?'\u2713':'?')+'</span>';
           wrap.appendChild(card);
         }
-
-        details.appendChild(wrap);
-        container.appendChild(details);
+        details.appendChild(wrap); container.appendChild(details);
       });
-
       show('screen-results');
     }
 
 
-    // ===== AUDIT HISTORY (localStorage) =====
-    var HISTORY_KEY = 'scannerAuditHistory';
+    /* ===== STORAGE ===== */
+    var SCAN_KEY = 'scannerAuditHistory';
+    var FRIDGE_KEY = 'fridgeTempHistory';
 
-    function getHistory(){
-      try {
-        var raw = localStorage.getItem(HISTORY_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch(e){ return []; }
-    }
+    function getScanHistory(){ try { var r=localStorage.getItem(SCAN_KEY); return r?JSON.parse(r):[]; } catch(e){ return []; } }
+    function saveScanHistory(h){ try { localStorage.setItem(SCAN_KEY, JSON.stringify(h)); } catch(e){} }
+    function getFridgeHistory(){ try { var r=localStorage.getItem(FRIDGE_KEY); return r?JSON.parse(r):[]; } catch(e){ return []; } }
+    function saveFridgeHistory(h){ try { localStorage.setItem(FRIDGE_KEY, JSON.stringify(h)); } catch(e){} }
 
-    function saveHistory(history){
-      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch(e){}
-    }
-
-    function saveAudit(){
-      var now = new Date();
-      var timestamp = now.toISOString();
-      var rows = [];
+    function saveScanAudit(){
+      var now = new Date(), timestamp = now.toISOString(), rows = [];
       for (var i = 0; i < scans.length; i++){
-        var code = scans[i];
-        var item = ITEMS.get(code);
-        rows.push({
-          date: now.toLocaleDateString('en-GB'),
-          time: now.toLocaleTimeString('en-GB'),
-          timestamp: timestamp,
-          item_id: code,
-          item_name: item ? item.name : '(Unknown)',
-          room: item ? item.room : '',
-          matched: item ? 'Yes' : 'No'
-        });
+        var code = scans[i], item = ITEMS.get(code);
+        rows.push({ date: now.toLocaleDateString('en-GB'), time: now.toLocaleTimeString('en-GB'),
+          timestamp: timestamp, item_id: code, item_name: item?item.name:'(Unknown)',
+          room: item?item.room:'', matched: item?'Yes':'No' });
       }
       if (rows.length === 0) return;
-      var history = getHistory();
-      history.push({ timestamp: timestamp, items: rows });
-      saveHistory(history);
-      updateHistoryBadge();
-      downloadSubmissionsCSV();
+      var history = getScanHistory();
+      history.push({ timestamp: timestamp, type: 'scan', items: rows });
+      saveScanHistory(history);
     }
 
-    function csvEscape(val){
-      var s = String(val == null ? '' : val);
-      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1){
-        return '"' + s.replace(/"/g, '""') + '"';
-      }
-      return s;
+    function saveFridgeCheck(data){
+      var now = new Date();
+      var record = {
+        timestamp: now.toISOString(),
+        type: 'fridge',
+        date: data.date,
+        current_temp: data.current,
+        min_temp: data.min,
+        max_temp: data.max,
+        thermometer_reset: data.reset,
+        comments: data.comments,
+        checked_by: data.checked_by
+      };
+      var history = getFridgeHistory();
+      history.push(record);
+      saveFridgeHistory(history);
     }
 
-    function downloadSubmissionsCSV(){
-      var history = getHistory();
-      if (history.length === 0) return;
-      var header = 'Date,Time,Audit #,Item ID,Item Name,Room,Matched';
-      var lines = [header];
-      for (var i = 0; i < history.length; i++){
-        var audit = history[i];
+
+    /* ===== EXCEL EXPORT ===== */
+    function downloadExcel(){
+      if (typeof XLSX === 'undefined'){ toast('Excel library not loaded'); return; }
+      var scanHistory = getScanHistory(), fridgeHistory = getFridgeHistory();
+      if (scanHistory.length === 0 && fridgeHistory.length === 0){ toast('No records to export'); return; }
+
+      var wb = XLSX.utils.book_new();
+
+      // Sheet 1: Room Audits
+      var scanRows = [];
+      for (var i = 0; i < scanHistory.length; i++){
+        var audit = scanHistory[i];
         for (var j = 0; j < audit.items.length; j++){
           var r = audit.items[j];
-          lines.push([
-            csvEscape(r.date),
-            csvEscape(r.time),
-            csvEscape(i + 1),
-            csvEscape(r.item_id),
-            csvEscape(r.item_name),
-            csvEscape(r.room),
-            csvEscape(r.matched)
-          ].join(','));
+          scanRows.push({ 'Date': r.date, 'Time': r.time, 'Audit #': i+1,
+            'Item ID': r.item_id, 'Item Name': r.item_name, 'Room': r.room, 'Matched': r.matched });
         }
       }
-      var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'SUBMISSIONS.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      if (scanRows.length > 0){
+        var ws1 = XLSX.utils.json_to_sheet(scanRows);
+        ws1['!cols'] = autoWidth(scanRows);
+        XLSX.utils.book_append_sheet(wb, ws1, 'Room Audits');
+      } else {
+        var ws1e = XLSX.utils.aoa_to_sheet([['No room audit records yet']]);
+        XLSX.utils.book_append_sheet(wb, ws1e, 'Room Audits');
+      }
+
+      // Sheet 2: Fridge Temp Checks
+      var fridgeRows = [];
+      for (var k = 0; k < fridgeHistory.length; k++){
+        var fc = fridgeHistory[k];
+        fridgeRows.push({ 'Date': fc.date, 'Current Temp (\u00b0C)': fc.current_temp,
+          'Min Temp (\u00b0C)': fc.min_temp, 'Max Temp (\u00b0C)': fc.max_temp,
+          'Thermometer Reset': fc.thermometer_reset, 'Comments': fc.comments||'',
+          'Checked By': fc.checked_by });
+      }
+      if (fridgeRows.length > 0){
+        var ws2 = XLSX.utils.json_to_sheet(fridgeRows);
+        ws2['!cols'] = autoWidth(fridgeRows);
+        XLSX.utils.book_append_sheet(wb, ws2, 'Fridge Temp Checks');
+      } else {
+        var ws2e = XLSX.utils.aoa_to_sheet([['No fridge check records yet']]);
+        XLSX.utils.book_append_sheet(wb, ws2e, 'Fridge Temp Checks');
+      }
+
+      var dateStr = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb, 'Nursing_Team_Checks_' + dateStr + '.xlsx');
+      toast('Excel file downloaded');
     }
 
-    function updateHistoryBadge(){
-      var history = getHistory();
-      var totalItems = 0;
-      for (var i = 0; i < history.length; i++) totalItems += history[i].items.length;
-      var text = history.length + ' audit' + (history.length !== 1 ? 's' : '') + ' saved (' + totalItems + ' items)';
-      var badge = document.getElementById('homeBadge');
-      if (badge) badge.textContent = text;
-    }
-
-    function exportToCSV(){
-      var history = getHistory();
-      if (history.length === 0){ toast('No audit history to export'); return; }
-      downloadSubmissionsCSV();
-      toast('SUBMISSIONS.csv downloaded');
+    function autoWidth(rows){
+      if (rows.length === 0) return [];
+      return Object.keys(rows[0]).map(function(key){
+        var max = key.length;
+        for (var i = 0; i < rows.length; i++){
+          var val = String(rows[i][key]||'');
+          if (val.length > max) max = val.length;
+        }
+        return { wch: max + 2 };
+      });
     }
 
 
-    // ===== CALENDAR DASHBOARD =====
-    var calYear, calMonth; // 0-indexed month
+    /* ===== CALENDAR ===== */
+    var calYear, calMonth, calFilter = 'all';
 
     function initCalendar(){
-      var now = new Date();
-      calYear = now.getFullYear();
-      calMonth = now.getMonth();
+      var now = new Date(); calYear = now.getFullYear(); calMonth = now.getMonth();
       renderCalendar();
     }
 
     function renderCalendar(){
-      var history = getHistory();
-      // Build set of date strings (DD/MM/YYYY) that have audits
-      var auditDates = {};
-      for (var i = 0; i < history.length; i++){
-        var ts = history[i].timestamp;
-        var d = new Date(ts);
-        var key = d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
-        if (!auditDates[key]) auditDates[key] = 0;
-        auditDates[key]++;
+      var scanH = getScanHistory(), fridgeH = getFridgeHistory();
+      var scanDates = {}, fridgeDates = {};
+
+      for (var i = 0; i < scanH.length; i++){
+        var d = new Date(scanH[i].timestamp);
+        var key = d.getDate()+'/'+d.getMonth()+'/'+d.getFullYear();
+        scanDates[key] = (scanDates[key]||0)+1;
+      }
+      for (var j = 0; j < fridgeH.length; j++){
+        var d2 = new Date(fridgeH[j].timestamp);
+        var key2 = d2.getDate()+'/'+d2.getMonth()+'/'+d2.getFullYear();
+        fridgeDates[key2] = (fridgeDates[key2]||0)+1;
       }
 
       var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       document.getElementById('calTitle').textContent = monthNames[calMonth] + ' ' + calYear;
-
-      var grid = document.getElementById('calGrid');
-      grid.innerHTML = '';
+      var grid = document.getElementById('calGrid'); grid.innerHTML = '';
 
       var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
       for (var dn = 0; dn < 7; dn++){
-        var hd = document.createElement('div');
-        hd.className = 'cal-head';
-        hd.textContent = dayNames[dn];
-        grid.appendChild(hd);
+        var hd = document.createElement('div'); hd.className='cal-head'; hd.textContent=dayNames[dn]; grid.appendChild(hd);
       }
 
-      var firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
-      var startOffset = (firstDay === 0) ? 6 : firstDay - 1; // Monday-based
-      var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-      var today = new Date();
-      var todayKey = today.getDate() + '/' + today.getMonth() + '/' + today.getFullYear();
+      var firstDay = new Date(calYear, calMonth, 1).getDay();
+      var startOffset = (firstDay===0)?6:firstDay-1;
+      var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+      var today = new Date(), todayKey = today.getDate()+'/'+today.getMonth()+'/'+today.getFullYear();
 
       for (var e = 0; e < startOffset; e++){
-        var empty = document.createElement('div');
-        empty.className = 'cal-day empty';
-        grid.appendChild(empty);
+        var empty = document.createElement('div'); empty.className='cal-day empty'; grid.appendChild(empty);
       }
 
       for (var day = 1; day <= daysInMonth; day++){
-        var cell = document.createElement('div');
-        cell.className = 'cal-day';
-        cell.textContent = day;
-        var cellKey = day + '/' + calMonth + '/' + calYear;
+        var cell = document.createElement('div'); cell.className='cal-day'; cell.textContent=day;
+        var cellKey = day+'/'+calMonth+'/'+calYear;
         if (cellKey === todayKey) cell.classList.add('today');
-        if (auditDates[cellKey]){
+
+        var hasScan = !!scanDates[cellKey];
+        var hasFridge = !!fridgeDates[cellKey];
+        var showScan = (calFilter==='all'||calFilter==='scan') && hasScan;
+        var showFridge = (calFilter==='all'||calFilter==='fridge') && hasFridge;
+
+        if (showScan && showFridge){
+          cell.classList.add('has-both');
+          var dot1 = document.createElement('div'); dot1.className='cal-dot'; cell.appendChild(dot1);
+        } else if (showScan){
           cell.classList.add('has-audit');
-          var dot = document.createElement('div');
-          dot.className = 'cal-dot';
-          cell.appendChild(dot);
-          (function(d, count){
-            cell.addEventListener('click', function(){ showDayAudits(d); });
-          })(day, auditDates[cellKey]);
+          var dot2 = document.createElement('div'); dot2.className='cal-dot'; cell.appendChild(dot2);
+        } else if (showFridge){
+          cell.classList.add('has-fridge');
+          var dot3 = document.createElement('div'); dot3.className='cal-dot blue'; cell.appendChild(dot3);
+        }
+
+        if (showScan || showFridge){
+          (function(dd){ cell.addEventListener('click', function(){ showDayEntries(dd); }); })(day);
         }
         grid.appendChild(cell);
       }
-
       document.getElementById('dayAuditList').innerHTML = '';
     }
 
-    function showDayAudits(day){
-      var history = getHistory();
-      var list = document.getElementById('dayAuditList');
-      list.innerHTML = '';
-      var auditsForDay = [];
-      for (var i = 0; i < history.length; i++){
-        var d = new Date(history[i].timestamp);
-        if (d.getDate() === day && d.getMonth() === calMonth && d.getFullYear() === calYear){
-          auditsForDay.push({ index: i, audit: history[i], date: d });
+    function showDayEntries(day){
+      var scanH = getScanHistory(), fridgeH = getFridgeHistory();
+      var list = document.getElementById('dayAuditList'); list.innerHTML = '';
+      var entries = [];
+
+      if (calFilter === 'all' || calFilter === 'scan'){
+        for (var i = 0; i < scanH.length; i++){
+          var d = new Date(scanH[i].timestamp);
+          if (d.getDate()===day && d.getMonth()===calMonth && d.getFullYear()===calYear)
+            entries.push({ type:'scan', index:i, data:scanH[i], date:d });
         }
       }
-      if (auditsForDay.length === 0){
-        list.innerHTML = '<p class="muted" style="text-align:center">No audits on this day.</p>';
+      if (calFilter === 'all' || calFilter === 'fridge'){
+        for (var j = 0; j < fridgeH.length; j++){
+          var d2 = new Date(fridgeH[j].timestamp);
+          if (d2.getDate()===day && d2.getMonth()===calMonth && d2.getFullYear()===calYear)
+            entries.push({ type:'fridge', index:j, data:fridgeH[j], date:d2 });
+        }
+      }
+
+      entries.sort(function(a,b){ return a.date - b.date; });
+
+      if (entries.length === 0){
+        list.innerHTML = '<p class="muted" style="text-align:center">No entries on this day.</p>';
         return;
       }
-      for (var j = 0; j < auditsForDay.length; j++){
-        var a = auditsForDay[j];
-        var matched = 0, unknown = 0;
-        for (var k = 0; k < a.audit.items.length; k++){
-          if (a.audit.items[k].matched === 'Yes') matched++; else unknown++;
+
+      for (var k = 0; k < entries.length; k++){
+        var en = entries[k], div = document.createElement('div');
+        div.className = 'audit-list-item' + (en.type==='fridge'?' fridge-item':'');
+        if (en.type === 'scan'){
+          var matched=0, unknown=0;
+          for (var m = 0; m < en.data.items.length; m++)
+            if (en.data.items[m].matched==='Yes') matched++; else unknown++;
+          div.innerHTML = '<div><div class="ali-time"><span class="ali-type scan">Scan</span>'+escapeHtml(en.date.toLocaleTimeString('en-GB'))+'</div>'+
+            '<div class="ali-count">'+en.data.items.length+' items \u00b7 '+matched+' matched \u00b7 '+unknown+' unknown</div></div><span class="ali-arrow">&rsaquo;</span>';
+          (function(idx){ div.addEventListener('click', function(){ showScanDetail(idx); }); })(en.index);
+        } else {
+          div.innerHTML = '<div><div class="ali-time"><span class="ali-type fridge">Fridge</span>'+escapeHtml(en.date.toLocaleTimeString('en-GB'))+'</div>'+
+            '<div class="ali-count">'+en.data.current_temp+'\u00b0C \u00b7 Checked by '+escapeHtml(en.data.checked_by)+'</div></div><span class="ali-arrow">&rsaquo;</span>';
+          (function(idx){ div.addEventListener('click', function(){ showFridgeDetail(idx); }); })(en.index);
         }
-        var div = document.createElement('div');
-        div.className = 'audit-list-item';
-        div.innerHTML = '<div><div class="ali-time">Audit at ' + escapeHtml(a.date.toLocaleTimeString('en-GB')) + '</div>' +
-          '<div class="ali-count">' + a.audit.items.length + ' items &middot; ' + matched + ' matched &middot; ' + unknown + ' unknown</div></div>' +
-          '<span class="ali-arrow">&rsaquo;</span>';
-        (function(idx){
-          div.addEventListener('click', function(){ showAuditDetail(idx); });
-        })(a.index);
         list.appendChild(div);
       }
     }
 
-    function showAuditDetail(historyIndex){
-      var history = getHistory();
-      var audit = history[historyIndex];
-      if (!audit) return;
-      var d = new Date(audit.timestamp);
-      document.getElementById('detailTitle').textContent = 'Audit — ' + d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB');
 
-      var matched = 0, unknown = 0;
-      for (var i = 0; i < audit.items.length; i++){
-        if (audit.items[i].matched === 'Yes') matched++; else unknown++;
-      }
+    /* ===== SCAN DETAIL ===== */
+    var currentScanIndex = -1;
+    function showScanDetail(idx){
+      var history = getScanHistory(), audit = history[idx]; if (!audit) return;
+      var d = new Date(audit.timestamp);
+      document.getElementById('detailTitle').textContent = 'Room Audit \u2014 '+d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB');
+      var matched=0, unknown=0;
+      for (var i = 0; i < audit.items.length; i++) if (audit.items[i].matched==='Yes') matched++; else unknown++;
       document.getElementById('detailMatched').textContent = String(matched);
       document.getElementById('detailUnknown').textContent = String(unknown);
       document.getElementById('detailTotal').textContent = String(audit.items.length);
 
-      // Group by room
       var groups = new Map();
       for (var j = 0; j < audit.items.length; j++){
         var r = audit.items[j];
-        var room = (r.matched === 'Yes') ? (r.room || 'Unassigned') : 'Unknown / Not in database';
+        var room = (r.matched==='Yes') ? (r.room||'Unassigned') : 'Unknown / Not in database';
         if (!groups.has(room)) groups.set(room, []);
         groups.get(room).push(r);
       }
-
-      var container = document.getElementById('detailBody');
-      container.innerHTML = '';
-
+      var container = document.getElementById('detailBody'); container.innerHTML = '';
       groups.forEach(function(items, room){
-        var details = document.createElement('details');
-        details.className = 'room-group';
-        details.setAttribute('open', 'open');
-        var isUnknown = room === 'Unknown / Not in database';
+        var details = document.createElement('details'); details.className='room-group'; details.setAttribute('open','open');
+        var isUnknown = room==='Unknown / Not in database';
         var summary = document.createElement('summary');
-        summary.innerHTML =
-          '<div class="room-badge">' +
-            '<span class="room-dot' + (isUnknown ? ' unknown' : '') + '"></span>' +
-            '<span>' + escapeHtml(room) + '</span>' +
-          '</div>' +
-          '<span class="room-count">' + items.length + ' item' + (items.length !== 1 ? 's' : '') + '</span>';
+        summary.innerHTML = '<div class="room-badge"><span class="room-dot'+(isUnknown?' unknown':'')+'"></span><span>'+escapeHtml(room)+'</span></div><span class="room-count">'+items.length+' item'+(items.length!==1?'s':'')+'</span>';
         details.appendChild(summary);
-        var wrap = document.createElement('div');
-        wrap.className = 'group-items';
+        var wrap = document.createElement('div'); wrap.className='group-items';
         for (var k = 0; k < items.length; k++){
-          var it = items[k];
-          var card = document.createElement('div');
-          card.className = 'item-card';
-          card.innerHTML =
-            '<span class="item-id mono">' + escapeHtml(it.item_id) + '</span>' +
-            '<span class="item-name">' + escapeHtml(it.item_name || '(Unknown item)') + '</span>' +
-            '<span class="' + (it.matched === 'Yes' ? 'match-ok' : 'match-fail') + '">' +
-              (it.matched === 'Yes' ? '\u2713' : '?') + '</span>';
+          var it = items[k], card = document.createElement('div'); card.className='item-card';
+          card.innerHTML = '<span class="item-id mono">'+escapeHtml(it.item_id)+'</span><span class="item-name">'+escapeHtml(it.item_name||'(Unknown item)')+'</span><span class="'+(it.matched==='Yes'?'match-ok':'match-fail')+'">'+(it.matched==='Yes'?'\u2713':'?')+'</span>';
           wrap.appendChild(card);
         }
-        details.appendChild(wrap);
-        container.appendChild(details);
+        details.appendChild(wrap); container.appendChild(details);
       });
-
-      currentDetailIndex = historyIndex;
+      currentScanIndex = idx;
       show('screen-detail');
     }
 
-    var currentDetailIndex = -1;
+    /* ===== FRIDGE DETAIL ===== */
+    var currentFridgeIndex = -1;
+    function showFridgeDetail(idx){
+      var history = getFridgeHistory(), record = history[idx]; if (!record) return;
+      document.getElementById('fridgeDetailTitle').textContent = 'Fridge Check \u2014 '+record.date;
+      var body = document.getElementById('fridgeDetailBody'); body.innerHTML = '';
+      var d = new Date(record.timestamp);
+      var fields = [
+        ['Date', record.date],
+        ['Time Recorded', d.toLocaleTimeString('en-GB')],
+        ['Current Temp', record.current_temp + '\u00b0C'],
+        ['Min Temp', record.min_temp + '\u00b0C'],
+        ['Max Temp', record.max_temp + '\u00b0C'],
+        ['Thermometer Reset', record.thermometer_reset],
+        ['Comments', record.comments || '\u2014'],
+        ['Checked By', record.checked_by]
+      ];
+      for (var i = 0; i < fields.length; i++){
+        var row = document.createElement('div'); row.className='fd-row';
+        row.innerHTML = '<span class="fd-label">'+escapeHtml(fields[i][0])+'</span><span class="fd-value">'+escapeHtml(fields[i][1])+'</span>';
+        body.appendChild(row);
+      }
+      currentFridgeIndex = idx;
+      show('screen-fridge-detail');
+    }
 
 
-    // ===== BUTTON HANDLERS =====
-
-    // Home menu
-    document.getElementById('menuScan').addEventListener('click', function(){
-      show('screen-setup');
+    /* ===== FRIDGE FORM LOGIC ===== */
+    document.querySelectorAll('.radio-opt input[type=radio]').forEach(function(radio){
+      radio.addEventListener('change', function(){
+        var group = this.closest('.radio-group');
+        group.querySelectorAll('.radio-opt').forEach(function(opt){ opt.classList.remove('selected'); });
+        this.closest('.radio-opt').classList.add('selected');
+      });
     });
-    document.getElementById('menuDashboard').addEventListener('click', function(){
-      initCalendar();
-      show('screen-dashboard');
-    });
-    document.getElementById('menuDownload').addEventListener('click', function(){
-      exportToCSV();
+
+    document.getElementById('fridgeForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var reset = document.querySelector('input[name=fReset]:checked');
+      var checked = document.querySelector('input[name=fChecked]:checked');
+      var valid = true;
+
+      document.getElementById('fResetError').style.display = 'none';
+      document.getElementById('fCheckedError').style.display = 'none';
+
+      if (!reset){ document.getElementById('fResetError').style.display = 'block'; valid = false; }
+      if (!checked){ document.getElementById('fCheckedError').style.display = 'block'; valid = false; }
+      if (!valid) return;
+
+      var dateVal = document.getElementById('fDate').value;
+      var parts = dateVal.split('-');
+      var formattedDate = parts[2]+'/'+parts[1]+'/'+parts[0];
+
+      saveFridgeCheck({
+        date: formattedDate,
+        current: parseFloat(document.getElementById('fCurrent').value),
+        min: parseFloat(document.getElementById('fMin').value),
+        max: parseFloat(document.getElementById('fMax').value),
+        reset: reset.value,
+        comments: document.getElementById('fComments').value.trim(),
+        checked_by: checked.value
+      });
+
+      toast('Fridge check saved');
+      this.reset();
+      document.querySelectorAll('.radio-opt').forEach(function(opt){ opt.classList.remove('selected'); });
+      show('screen-home');
     });
 
-    // Setup -> navigate to clear/start screen
-    document.getElementById('btnBegin').addEventListener('click', function(){
-      show('screen-start');
-      renderQR('qrStart', '^&030&^');
-    });
 
-    // Start -> audit animation -> auto-advance to upload after 60 seconds
+    /* ===== BUTTON HANDLERS ===== */
+
+    // Home
+    document.getElementById('menuScan').addEventListener('click', function(){ show('screen-setup'); });
+    document.getElementById('menuFridge').addEventListener('click', function(){
+      document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+      show('screen-fridge');
+    });
+    document.getElementById('menuDashboard').addEventListener('click', function(){ initCalendar(); show('screen-dashboard'); });
+    document.getElementById('menuDownload').addEventListener('click', function(){ downloadExcel(); });
+
+    // Scanner flow
+    document.getElementById('setupBack').addEventListener('click', function(){ show('screen-home'); });
+    document.getElementById('btnBegin').addEventListener('click', function(){ show('screen-start'); renderQR('qrStart', '^&030&^'); });
     document.getElementById('btnStart').addEventListener('click', function(){
-      scans = [];
-      show('screen-audit');
+      scans = []; show('screen-audit');
       setTimeout(function(){
         document.getElementById('uploadQRWrap').classList.remove('hidden');
         document.getElementById('uploadCounter').classList.add('hidden');
         document.getElementById('captureCount').textContent = '0';
         document.getElementById('uploadHint').textContent = 'Scans will appear automatically \u2014 please wait';
-        show('screen-upload');
-        renderQR('qrUpload', '^&032&^');
-        focusInput();
+        show('screen-upload'); renderQR('qrUpload', '^&032&^'); focusInput();
       }, 60000);
     });
-
-    // Confirm -> save audit to history -> back to home
     document.getElementById('btnConfirm').addEventListener('click', function(){
-      saveAudit();
-      toast('Audit saved');
-      scans = [];
-      show('screen-home');
+      saveScanAudit(); toast('Audit saved'); scans = []; show('screen-home');
     });
 
-    // Dashboard navigation
+    // Fridge back
+    document.getElementById('fridgeBack').addEventListener('click', function(){ show('screen-home'); });
+
+    // Dashboard
     document.getElementById('dashBack').addEventListener('click', function(){ show('screen-home'); });
-    document.getElementById('calPrev').addEventListener('click', function(){
-      calMonth--;
-      if (calMonth < 0){ calMonth = 11; calYear--; }
+    document.getElementById('calPrev').addEventListener('click', function(){ calMonth--; if (calMonth<0){ calMonth=11; calYear--; } renderCalendar(); });
+    document.getElementById('calNext').addEventListener('click', function(){ calMonth++; if (calMonth>11){ calMonth=0; calYear++; } renderCalendar(); });
+
+    // Tab filter
+    function setTab(filter){
+      calFilter = filter;
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.className='tab-btn'; });
+      if (filter==='all') document.getElementById('tabAll').classList.add('active');
+      else if (filter==='scan') document.getElementById('tabScans').classList.add('active');
+      else document.getElementById('tabFridge').classList.add('active-blue');
       renderCalendar();
-    });
-    document.getElementById('calNext').addEventListener('click', function(){
-      calMonth++;
-      if (calMonth > 11){ calMonth = 0; calYear++; }
-      renderCalendar();
-    });
+    }
+    document.getElementById('tabAll').addEventListener('click', function(){ setTab('all'); });
+    document.getElementById('tabScans').addEventListener('click', function(){ setTab('scan'); });
+    document.getElementById('tabFridge').addEventListener('click', function(){ setTab('fridge'); });
 
     // Detail back
-    document.getElementById('detailBack').addEventListener('click', function(){
-      initCalendar();
-      show('screen-dashboard');
-    });
+    document.getElementById('detailBack').addEventListener('click', function(){ initCalendar(); show('screen-dashboard'); });
+    document.getElementById('fridgeDetailBack').addEventListener('click', function(){ initCalendar(); show('screen-dashboard'); });
 
-    // Delete single audit
+    // Delete scan audit
     document.getElementById('btnDeleteAudit').addEventListener('click', function(){
       var input = prompt('Type DELETE to permanently remove this audit.');
       if (input !== 'DELETE') return;
-      var history = getHistory();
-      if (currentDetailIndex < 0 || currentDetailIndex >= history.length) return;
-      history.splice(currentDetailIndex, 1);
-      saveHistory(history);
-      updateHistoryBadge();
-      toast('Audit deleted');
-      initCalendar();
-      show('screen-dashboard');
+      var history = getScanHistory();
+      if (currentScanIndex<0||currentScanIndex>=history.length) return;
+      history.splice(currentScanIndex, 1);
+      saveScanHistory(history);
+      toast('Audit deleted'); initCalendar(); show('screen-dashboard');
+    });
+
+    // Delete fridge check
+    document.getElementById('btnDeleteFridge').addEventListener('click', function(){
+      var input = prompt('Type DELETE to permanently remove this fridge check.');
+      if (input !== 'DELETE') return;
+      var history = getFridgeHistory();
+      if (currentFridgeIndex<0||currentFridgeIndex>=history.length) return;
+      history.splice(currentFridgeIndex, 1);
+      saveFridgeHistory(history);
+      toast('Fridge check deleted'); initCalendar(); show('screen-dashboard');
     });
 
 
-    // ===== TOAST =====
+    /* ===== TOAST ===== */
     function toast(msg){
       var t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.remove('hidden');
+      t.textContent = msg; t.classList.remove('hidden');
       setTimeout(function(){ t.classList.add('hidden'); }, 1600);
     }
 
 
-    // ===== INIT =====
+    /* ===== INIT ===== */
     async function init(){
       loadEmbeddedItems();
       var csvLoaded = await tryLoadCSV();
-      if (csvLoaded) console.log('Loaded ' + ITEMS.size + ' items from List_Items.csv');
-      else console.log('Using ' + ITEMS.size + ' embedded items');
-
-      updateHistoryBadge();
+      if (csvLoaded) console.log('Loaded '+ITEMS.size+' items from List_Items.csv');
+      else console.log('Using '+ITEMS.size+' embedded items');
     }
-
     init();
+
   })();
   </script>
 </body>
