@@ -1137,7 +1137,7 @@
 
     /* ---- Google Sheets sync ---- */
     // Replace this URL with your deployed Google Apps Script Web App URL
-    var GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+    var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywfRa9Ad6evBMwaZpbBOOCqfvQnL2dRk7DNFjHi8mFW7C26_2fVcz26-MAucDAOwmA/exec';
 
     function pushToSheet(type, payload){
       if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) { console.warn('Google Script URL not configured'); return; }
