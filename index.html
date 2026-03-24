@@ -169,10 +169,16 @@
       box-shadow: 0 8px 28px rgba(52,199,89,.12); }
     .menu-card.blue:hover { border-color: var(--blue);
       box-shadow: 0 8px 28px rgba(0,122,255,.12); }
-    .menu-icon { font-size: 1.8rem; width: 48px; height: 48px; display: flex; align-items: center;
-      justify-content: center; border-radius: 14px;
+    .menu-icon { font-size: 1.8rem; width: 52px; height: 52px; display: flex; align-items: center;
+      justify-content: center; border-radius: 16px;
       background: rgba(52,199,89,.1); flex-shrink: 0; }
     .menu-icon.blue-bg { background: rgba(0,122,255,.1); }
+    .menu-icon img, .dash-icon img { width: 30px; height: 30px; object-fit: contain; }
+    .dash-icon img { width: 22px; height: 22px; }
+    .fp-icon img { width: 56px; height: 56px; object-fit: contain; }
+    .header-illustration { width: min(100px, 20vw); margin: 0 auto 8px; display: block; }
+    .flaticon-attr { margin-top: 24px; font-size: .7rem; color: var(--muted); opacity: .6; }
+    .flaticon-attr a { color: var(--muted); text-decoration: underline; }
     .menu-card .menu-label { font-size: 1.1rem; font-weight: 700; }
     .menu-card .menu-desc { font-size: .83rem; color: var(--muted); margin-top: 2px; }
 
@@ -432,28 +438,29 @@
   <!-- HOME -->
   <div class="screen" id="screen-home">
     <div class="panel wide">
+      <img src="https://cdn-icons-png.flaticon.com/128/14596/14596114.png" class="header-illustration" alt="">
       <h1 class="glow" style="font-size:clamp(1.8rem,5vw,2.4rem)">Nursing Team Checks</h1>
       <p class="muted" style="font-size:1.05rem">Choose an option to get started</p>
       <div class="home-layout">
         <div class="home-menu">
           <div class="menu-grid">
             <div class="menu-card" id="menuScan">
-              <div class="menu-icon">&#128225;</div>
+              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""></div>
               <div><div class="menu-label">Room Audit</div>
               <div class="menu-desc">Connect scanner &amp; begin a room audit</div></div>
             </div>
             <div class="menu-card blue" id="menuFridge">
-              <div class="menu-icon blue-bg">&#127777;</div>
+              <div class="menu-icon blue-bg"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></div>
               <div><div class="menu-label">Fridge Temp Check</div>
               <div class="menu-desc">Log medicines storage temperatures</div></div>
             </div>
             <div class="menu-card" id="menuDashboard">
-              <div class="menu-icon">&#128197;</div>
+              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" alt=""></div>
               <div><div class="menu-label">History &amp; Calendar</div>
               <div class="menu-desc">View all past submissions</div></div>
             </div>
             <div class="menu-card" id="menuDownload">
-              <div class="menu-icon">&#128190;</div>
+              <div class="menu-icon"><img src="https://cdn-icons-png.flaticon.com/128/14596/14596179.png" alt=""></div>
               <div><div class="menu-label">Download Excel</div>
               <div class="menu-desc">Export all records as .xlsx workbook</div></div>
             </div>
@@ -462,14 +469,14 @@
         <div class="home-dash">
           <!-- Fridge Temp Widget -->
           <div class="dash-widget">
-            <h3><span class="dash-icon">&#127777;</span> Fridge Checks &mdash; This Week</h3>
+            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></span> Fridge Checks &mdash; This Week</h3>
             <div class="dash-week-label" id="dashWeekLabel"></div>
             <div id="dashFridgeBody"></div>
             <div id="dashFridgeSummary"></div>
           </div>
           <!-- Room Audit Widget -->
           <div class="dash-widget">
-            <h3><span class="dash-icon">&#128225;</span> Room Audit &mdash; This Week</h3>
+            <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt=""></span> Room Audit &mdash; This Week</h3>
             <div class="dash-scan-header">
               <span class="dash-scan-count" id="dashScanCount">0 / 0</span>
               <span class="dash-scan-pct" id="dashScanPct">0%</span>
@@ -479,6 +486,7 @@
           </div>
         </div>
       </div>
+      <div class="flaticon-attr">Icons by <a href="https://www.flaticon.com/authors/juicy-fish" target="_blank" rel="noopener">juicy_fish</a> &mdash; <a href="https://www.flaticon.com/packs/medical-14595708" target="_blank" rel="noopener">Flaticon</a></div>
     </div>
   </div>
 
@@ -578,16 +586,17 @@
   <div class="screen hidden" id="screen-fridge-pick">
     <div class="panel">
       <button class="back-link" id="fridgePickBack">&larr; Home</button>
+      <img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" style="width:56px;margin:0 auto 8px;display:block" alt="">
       <h2 class="glow">Which Fridge?</h2>
       <p class="muted" style="margin-bottom:8px">Select the fridge you are checking</p>
       <div class="fridge-picker">
         <div class="fridge-pick-card" id="pickFridge1">
-          <div class="fp-icon">1&#65039;&#8419;</div>
+          <div class="fp-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></div>
           <div class="fp-label">Fridge 1</div>
           <div class="fp-desc">Medicines fridge</div>
         </div>
         <div class="fridge-pick-card" id="pickFridge2">
-          <div class="fp-icon">2&#65039;&#8419;</div>
+          <div class="fp-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595747.png" alt=""></div>
           <div class="fp-label">Fridge 2</div>
           <div class="fp-desc">Medicines fridge</div>
         </div>
@@ -599,6 +608,7 @@
   <div class="screen scroll-top hidden" id="screen-fridge">
     <div class="panel">
       <button class="back-link" id="fridgeBack">&larr; Home</button>
+      <img src="https://cdn-icons-png.flaticon.com/128/14595/14595747.png" style="width:48px;margin:0 auto 8px;display:block" alt="">
       <h2 class="glow" style="margin-bottom:4px" id="fridgeFormTitle">Medicines Storage Temp Check</h2>
       <p class="muted" style="margin-bottom:20px">Complete all required fields</p>
       <form id="fridgeForm" autocomplete="off">
@@ -653,6 +663,7 @@
   <div class="screen scroll-top hidden" id="screen-dashboard">
     <div class="panel wide">
       <button class="back-link" id="dashBack">&larr; Home</button>
+      <img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" style="width:48px;margin:0 auto 8px;display:block" alt="">
       <h2 class="glow" style="margin-bottom:4px">History &amp; Calendar</h2>
       <p class="muted" style="margin-bottom:12px">Tap a highlighted day to see submissions</p>
       <div class="tab-row">
