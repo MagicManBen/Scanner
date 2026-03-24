@@ -1135,27 +1135,28 @@
     function getFridgeHistory(){ try { var r=localStorage.getItem(FRIDGE_KEY); return r?JSON.parse(r):[]; } catch(e){ return []; } }
     function saveFridgeHistory(h){ try { localStorage.setItem(FRIDGE_KEY, JSON.stringify(h)); } catch(e){} }
 
-    /* ---- GitHub CSV sync ---- */
-    var LOG_API = '/api/log';
+    /* ---- Google Sheets sync ---- */
+    // Replace this URL with your deployed Google Apps Script Web App URL
+    var GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
-    function pushToGitHub(type, payload){
-      // Fire-and-forget POST to the API; never blocks the UI
+    function pushToSheet(type, payload){
+      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) { console.warn('Google Script URL not configured'); return; }
       try {
-        fetch(LOG_API, {
+        fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.assign({ type: type }, payload))
+          body: JSON.stringify(Object.assign({ type: type }, payload)),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         }).then(function(r){
-          if (!r.ok) r.text().then(function(t){ console.warn('GitHub log error:', t); });
-          else console.log('Logged to GitHub (' + type + ')');
-        }).catch(function(e){ console.warn('GitHub log fetch failed:', e); });
-      } catch(e){ console.warn('pushToGitHub error:', e); }
+          if (r.ok) console.log('Logged to Google Sheet (' + type + ')');
+          else console.warn('Sheet POST status:', r.status);
+        }).catch(function(e){ console.warn('Sheet sync failed:', e); });
+      } catch(e){ console.warn('pushToSheet error:', e); }
     }
 
-    async function loadFromGitHub(){
-      // Pull CSV logs from GitHub and merge into localStorage
+    async function loadFromSheet(){
+      if (GOOGLE_SCRIPT_URL.indexOf('YOUR_') === 0) return;
       try {
-        var r = await fetch(LOG_API);
+        var r = await fetch(GOOGLE_SCRIPT_URL + '?action=all');
         if (!r.ok) return;
         var data = await r.json();
 
@@ -1175,9 +1176,9 @@
                 fridge_number: parseInt(fn) || 1,
                 date: gf['Date'] || '',
                 time: gf['Time'] || '',
-                current_temp: parseFloat(gf['Current Temp (°C)']) || 0,
-                min_temp: parseFloat(gf['Min Temp (°C)']) || 0,
-                max_temp: parseFloat(gf['Max Temp (°C)']) || 0,
+                current_temp: parseFloat(gf['Current Temp (\u00b0C)']) || 0,
+                min_temp: parseFloat(gf['Min Temp (\u00b0C)']) || 0,
+                max_temp: parseFloat(gf['Max Temp (\u00b0C)']) || 0,
                 thermometer_reset: gf['Thermometer Reset'] || '',
                 comments: gf['Comments'] || '',
                 checked_by: gf['Checked By'] || ''
@@ -1185,14 +1186,13 @@
               added++;
             }
           }
-          if (added > 0) { saveFridgeHistory(localF); console.log('Merged ' + added + ' fridge records from GitHub'); }
+          if (added > 0) { saveFridgeHistory(localF); console.log('Merged ' + added + ' fridge records from Google Sheet'); }
         }
 
         // Merge audit records
         if (data.audit && data.audit.length) {
           var localS = getScanHistory();
           var localTsSet = new Set(localS.map(function(a){ return a.timestamp; }));
-          // Group GitHub rows by Audit Timestamp
           var grouped = {};
           for (var j = 0; j < data.audit.length; j++) {
             var ga = data.audit[j];
@@ -1215,9 +1215,9 @@
               addedA++;
             }
           }
-          if (addedA > 0) { saveScanHistory(localS); console.log('Merged ' + addedA + ' audit records from GitHub'); }
+          if (addedA > 0) { saveScanHistory(localS); console.log('Merged ' + addedA + ' audit records from Google Sheet'); }
         }
-      } catch(e){ console.warn('loadFromGitHub failed (offline?):', e); }
+      } catch(e){ console.warn('loadFromSheet failed (offline?):', e); }
     }
 
     function saveScanAudit(){
@@ -1254,8 +1254,8 @@
       history.push({ timestamp: timestamp, type: 'scan', overall_comments: overallComments, items: rows });
       saveScanHistory(history);
 
-      // Push to GitHub CSV
-      pushToGitHub('audit', { rows: rows, overall_comments: overallComments });
+      // Push to Google Sheet
+      pushToSheet('audit', { rows: rows, overall_comments: overallComments });
     }
 
     function saveFridgeCheck(data){
@@ -1277,8 +1277,8 @@
       history.push(record);
       saveFridgeHistory(history);
 
-      // Push to GitHub CSV
-      pushToGitHub('fridge', { rows: [{
+      // Push to Google Sheet
+      pushToSheet('fridge', { rows: [{
         fridge: 'Fridge ' + data.fridge_number,
         date: data.date,
         time: data.time,
@@ -1865,8 +1865,8 @@
       if (csvLoaded) console.log('Loaded '+ITEMS.size+' items from List_Items.csv');
       else console.log('Using '+ITEMS.size+' embedded items');
 
-      // Merge any records from GitHub that this device doesn't have yet
-      await loadFromGitHub();
+      // Merge any records from Google Sheet that this device doesn't have yet
+      await loadFromSheet();
 
       updateHomeDashboard();
     }
