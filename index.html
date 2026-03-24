@@ -296,24 +296,47 @@
     .cal-legend-dot.green { background: var(--accent); }
     .cal-legend-dot.blue-dot { background: var(--blue); }
 
-    /* ===== Home dashboard – at-a-glance layout ===== */
-    .today-date-label { font-size: .95rem; color: var(--muted); margin-bottom: 0; }
+    /* ===== Home dashboard ===== */
+    .today-date-label { font-size: .92rem; color: var(--muted); margin-bottom: 0; }
 
-    /* Status tiles */
-    .today-section { margin-top: 20px; text-align: left; }
-    .section-label { font-size: .7rem; font-weight: 800; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .1em; margin-bottom: 10px; }
-    .status-tiles { display: flex; gap: 12px; }
-    .status-tile { flex: 1; padding: 16px 18px; border-radius: 16px;
+    /* Menu buttons – prominent row at top */
+    .menu-buttons { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 20px 0 0; }
+    .menu-btn { display: flex; align-items: center; gap: 12px; padding: 16px 18px;
+      border-radius: 16px; border: 1px solid var(--glass-border);
+      background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      cursor: pointer; text-align: left;
+      transition: transform .15s, box-shadow .2s, border-color .2s;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+    .menu-btn:hover { transform: translateY(-2px); border-color: var(--accent);
+      box-shadow: 0 6px 24px rgba(52,199,89,.12); }
+    .menu-btn.blue-hover:hover { border-color: var(--blue);
+      box-shadow: 0 6px 24px rgba(0,122,255,.12); }
+    .menu-btn img { width: 34px; height: 34px; flex-shrink: 0; }
+    .menu-btn .mb-text { display: flex; flex-direction: column; }
+    .menu-btn .mb-label { font-size: .95rem; font-weight: 700; }
+    .menu-btn .mb-desc { font-size: .74rem; color: var(--muted); margin-top: 1px; }
+    @media (max-width: 700px) { .menu-buttons { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 380px) { .menu-buttons { grid-template-columns: 1fr; } }
+
+    /* 50/50 dashboard split */
+    .dash-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      margin-top: 18px; text-align: left; }
+    @media (max-width: 600px) { .dash-split { grid-template-columns: 1fr; } }
+    .dash-half { display: flex; flex-direction: column; gap: 12px; }
+    .dash-half-label { font-size: .68rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em; margin-bottom: 2px; }
+
+    /* Status tiles (today column) */
+    .status-tile { padding: 14px 16px; border-radius: 14px;
       background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 2px solid var(--glass-border); text-align: left;
       transition: border-color .3s, box-shadow .3s; cursor: default; }
-    .status-tile .st-icon { display: flex; align-items: center; gap: 7px;
-      font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .06em; margin-bottom: 8px; }
-    .status-tile .st-icon img { width: 20px; height: 20px; }
-    .status-tile .st-main { font-size: 1.08rem; font-weight: 700; line-height: 1.3; }
-    .status-tile .st-detail { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+    .status-tile .st-icon { display: flex; align-items: center; gap: 6px;
+      font-size: .7rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 6px; }
+    .status-tile .st-icon img { width: 18px; height: 18px; }
+    .status-tile .st-main { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+    .status-tile .st-detail { font-size: .78rem; color: var(--muted); margin-top: 3px; }
     .status-tile.good { border-color: rgba(52,199,89,.45); background: rgba(52,199,89,.07); }
     .status-tile.good .st-main { color: #1a7a33; }
     .status-tile.warning { border-color: rgba(255,149,0,.45); background: rgba(255,149,0,.07); }
@@ -325,63 +348,44 @@
       0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,.12); }
       50%     { box-shadow: 0 0 18px 4px rgba(255,59,48,.1); }
     }
-    @media (max-width: 480px) { .status-tiles { flex-direction: column; } }
 
-    /* Quick-action strip */
-    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 4px; }
-    .qa-card { display: flex; flex-direction: column; align-items: center; gap: 6px;
-      padding: 14px 6px; border-radius: 16px;
-      background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border); cursor: pointer; text-align: center;
-      transition: transform .15s, box-shadow .2s, border-color .2s;
-      box-shadow: 0 2px 10px rgba(0,0,0,.03); }
-    .qa-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,.08);
-      border-color: var(--accent); }
-    .qa-card.blue-hover:hover { border-color: var(--blue); box-shadow: 0 6px 22px rgba(0,122,255,.1); }
-    .qa-card img { width: 30px; height: 30px; }
-    .qa-card .qa-label { font-size: .78rem; font-weight: 700; line-height: 1.2; }
-    @media (max-width: 480px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
-
-    /* Weekly detail */
-    .weekly-section { margin-top: 14px; text-align: left; }
-    .weekly-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 600px) { .weekly-widgets { grid-template-columns: 1fr; } }
+    /* Weekly widgets (this-week column) */
     .dash-widget { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: 16px;
-      padding: 16px; text-align: left;
+      border: 1px solid var(--glass-border); border-radius: 14px;
+      padding: 14px; text-align: left;
       box-shadow: 0 2px 12px rgba(0,0,0,.04); }
-    .dash-widget h3 { margin: 0 0 10px; font-size: .88rem; display: flex; align-items: center; gap: 7px;
+    .dash-widget h3 { margin: 0 0 8px; font-size: .84rem; display: flex; align-items: center; gap: 6px;
       color: var(--muted); }
-    .dash-widget h3 .dash-icon img { width: 18px; height: 18px; }
-    .dash-week-row { display: flex; align-items: center; gap: 10px; padding: 5px 0;
-      border-bottom: 1px solid rgba(0,0,0,.04); font-size: .84rem; }
+    .dash-widget h3 .dash-icon img { width: 16px; height: 16px; }
+    .dash-week-row { display: flex; align-items: center; gap: 8px; padding: 4px 0;
+      border-bottom: 1px solid rgba(0,0,0,.04); font-size: .82rem; }
     .dash-week-row:last-child { border-bottom: none; }
-    .dash-week-row .day-label { width: 30px; font-weight: 700; color: var(--muted); font-size: .8rem; }
-    .dash-week-row .day-date { width: 44px; color: var(--muted); font-size: .76rem; }
-    .dash-week-row .day-status { margin-left: auto; font-weight: 600; font-size: .78rem; }
+    .dash-week-row .day-label { width: 28px; font-weight: 700; color: var(--muted); font-size: .78rem; }
+    .dash-week-row .day-date { width: 40px; color: var(--muted); font-size: .74rem; }
+    .dash-week-row .day-status { margin-left: auto; font-weight: 600; font-size: .76rem; }
     .dash-week-row .day-status.done { color: var(--accent); }
     .dash-week-row .day-status.missing { color: var(--danger); }
     .dash-week-row .day-status.pending { color: var(--orange); }
     .dash-week-row .day-status.holiday { color: var(--muted); font-style: italic; font-weight: 400; }
     .dash-week-row .day-status.future { color: var(--muted); font-weight: 400; }
-    .dash-progress { width: 100%; height: 7px; border-radius: 6px; background: rgba(0,0,0,.06);
-      overflow: hidden; margin: 8px 0 4px; }
+    .dash-progress { width: 100%; height: 6px; border-radius: 6px; background: rgba(0,0,0,.06);
+      overflow: hidden; margin: 6px 0 4px; }
     .dash-progress-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
     .dash-progress-fill.green { background: linear-gradient(90deg, #34c759, #30d158); }
     .dash-progress-fill.blue { background: linear-gradient(90deg, #007aff, #5ac8fa); }
     .dash-scan-header { display: flex; align-items: baseline; justify-content: space-between; }
-    .dash-scan-count { font-size: 1.3rem; font-weight: 800; }
-    .dash-scan-pct { font-size: .9rem; font-weight: 700; color: var(--muted); }
-    .dash-unscanned { margin-top: 8px; max-height: 120px; overflow-y: auto; }
-    .dash-unscanned-item { padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,.04);
-      font-size: .78rem; color: var(--muted); }
+    .dash-scan-count { font-size: 1.15rem; font-weight: 800; }
+    .dash-scan-pct { font-size: .85rem; font-weight: 700; color: var(--muted); }
+    .dash-unscanned { margin-top: 6px; max-height: 100px; overflow-y: auto; }
+    .dash-unscanned-item { padding: 2px 0; border-bottom: 1px solid rgba(0,0,0,.04);
+      font-size: .76rem; color: var(--muted); }
     .dash-unscanned-item:last-child { border-bottom: none; }
-    .dash-fridge-summary { display: flex; align-items: center; gap: 8px; margin-top: 8px;
-      padding: 8px 12px; border-radius: 12px; font-size: .82rem; font-weight: 600; }
+    .dash-fridge-summary { display: flex; align-items: center; gap: 6px; margin-top: 6px;
+      padding: 6px 10px; border-radius: 10px; font-size: .78rem; font-weight: 600; }
     .dash-fridge-summary.all-good { background: rgba(52,199,89,.1); color: #1a7a33; }
     .dash-fridge-summary.has-issues { background: rgba(255,59,48,.08); color: var(--danger); }
     .dash-fridge-summary.all-pending { background: rgba(255,149,0,.1); color: #c77800; }
-    .dash-week-label { font-size: .76rem; color: var(--muted); margin-bottom: 8px; }
+    .dash-week-label { font-size: .74rem; color: var(--muted); margin-bottom: 6px; }
 
     /* Fridge picker */
     .fridge-picker { display: flex; gap: 16px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
@@ -510,14 +514,35 @@
   <!-- HOME -->
   <div class="screen" id="screen-home">
     <div class="panel wide">
-      <img src="https://cdn-icons-png.flaticon.com/128/14596/14596114.png" class="header-illustration" style="width:min(72px,16vw)" alt="">
-      <h1 class="glow" style="font-size:clamp(1.6rem,4.5vw,2.1rem);margin-bottom:4px">Nursing Team Checks</h1>
+      <img src="https://cdn-icons-png.flaticon.com/128/14596/14596114.png" class="header-illustration" style="width:min(64px,14vw)" alt="">
+      <h1 class="glow" style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:2px">Nursing Team Checks</h1>
       <p class="today-date-label" id="todayDateLabel"></p>
 
-      <!-- TODAY'S STATUS -->
-      <div class="today-section">
-        <div class="section-label">Today&rsquo;s Status</div>
-        <div class="status-tiles">
+      <!-- MENU BUTTONS -->
+      <div class="menu-buttons">
+        <div class="menu-btn" id="menuScan">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt="">
+          <div class="mb-text"><span class="mb-label">Room Audit</span><span class="mb-desc">Start a scan</span></div>
+        </div>
+        <div class="menu-btn blue-hover" id="menuFridge">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt="">
+          <div class="mb-text"><span class="mb-label">Fridge Check</span><span class="mb-desc">Log temps</span></div>
+        </div>
+        <div class="menu-btn" id="menuDashboard">
+          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" alt="">
+          <div class="mb-text"><span class="mb-label">History</span><span class="mb-desc">Past submissions</span></div>
+        </div>
+        <div class="menu-btn" id="menuDownload">
+          <img src="https://cdn-icons-png.flaticon.com/128/14596/14596179.png" alt="">
+          <div class="mb-text"><span class="mb-label">Download</span><span class="mb-desc">Export .xlsx</span></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD: 50/50 split -->
+      <div class="dash-split">
+        <!-- LEFT: Today -->
+        <div class="dash-half">
+          <div class="dash-half-label">Today</div>
           <div class="status-tile neutral" id="statusFridge">
             <div class="st-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""> Fridge Check</div>
             <div class="st-main">&hellip;</div>
@@ -529,32 +554,9 @@
             <div class="st-detail"></div>
           </div>
         </div>
-      </div>
-
-      <!-- QUICK ACTIONS -->
-      <div class="quick-actions">
-        <div class="qa-card" id="menuScan">
-          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595771.png" alt="">
-          <div class="qa-label">Room Audit</div>
-        </div>
-        <div class="qa-card blue-hover" id="menuFridge">
-          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt="">
-          <div class="qa-label">Fridge Check</div>
-        </div>
-        <div class="qa-card" id="menuDashboard">
-          <img src="https://cdn-icons-png.flaticon.com/128/14595/14595981.png" alt="">
-          <div class="qa-label">History</div>
-        </div>
-        <div class="qa-card" id="menuDownload">
-          <img src="https://cdn-icons-png.flaticon.com/128/14596/14596179.png" alt="">
-          <div class="qa-label">Download</div>
-        </div>
-      </div>
-
-      <!-- WEEKLY DETAIL -->
-      <div class="weekly-section">
-        <div class="section-label">This Week &mdash; <span id="dashWeekLabel"></span></div>
-        <div class="weekly-widgets">
+        <!-- RIGHT: This Week -->
+        <div class="dash-half">
+          <div class="dash-half-label">This Week &mdash; <span id="dashWeekLabel"></span></div>
           <div class="dash-widget">
             <h3><span class="dash-icon"><img src="https://cdn-icons-png.flaticon.com/128/14595/14595743.png" alt=""></span> Fridge Checks</h3>
             <div id="dashFridgeBody"></div>
@@ -1133,6 +1135,91 @@
     function getFridgeHistory(){ try { var r=localStorage.getItem(FRIDGE_KEY); return r?JSON.parse(r):[]; } catch(e){ return []; } }
     function saveFridgeHistory(h){ try { localStorage.setItem(FRIDGE_KEY, JSON.stringify(h)); } catch(e){} }
 
+    /* ---- GitHub CSV sync ---- */
+    var LOG_API = '/api/log';
+
+    function pushToGitHub(type, payload){
+      // Fire-and-forget POST to the API; never blocks the UI
+      try {
+        fetch(LOG_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.assign({ type: type }, payload))
+        }).then(function(r){
+          if (!r.ok) r.text().then(function(t){ console.warn('GitHub log error:', t); });
+          else console.log('Logged to GitHub (' + type + ')');
+        }).catch(function(e){ console.warn('GitHub log fetch failed:', e); });
+      } catch(e){ console.warn('pushToGitHub error:', e); }
+    }
+
+    async function loadFromGitHub(){
+      // Pull CSV logs from GitHub and merge into localStorage
+      try {
+        var r = await fetch(LOG_API);
+        if (!r.ok) return;
+        var data = await r.json();
+
+        // Merge fridge records
+        if (data.fridge && data.fridge.length) {
+          var localF = getFridgeHistory();
+          var localFSet = new Set(localF.map(function(f){ return f.date+'|'+f.time+'|'+(f.fridge_number||1); }));
+          var added = 0;
+          for (var i = 0; i < data.fridge.length; i++) {
+            var gf = data.fridge[i];
+            var fn = gf['Fridge'] ? gf['Fridge'].replace('Fridge ','') : '1';
+            var key = gf['Date']+'|'+gf['Time']+'|'+fn;
+            if (!localFSet.has(key)) {
+              localF.push({
+                timestamp: new Date().toISOString(),
+                type: 'fridge',
+                fridge_number: parseInt(fn) || 1,
+                date: gf['Date'] || '',
+                time: gf['Time'] || '',
+                current_temp: parseFloat(gf['Current Temp (°C)']) || 0,
+                min_temp: parseFloat(gf['Min Temp (°C)']) || 0,
+                max_temp: parseFloat(gf['Max Temp (°C)']) || 0,
+                thermometer_reset: gf['Thermometer Reset'] || '',
+                comments: gf['Comments'] || '',
+                checked_by: gf['Checked By'] || ''
+              });
+              added++;
+            }
+          }
+          if (added > 0) { saveFridgeHistory(localF); console.log('Merged ' + added + ' fridge records from GitHub'); }
+        }
+
+        // Merge audit records
+        if (data.audit && data.audit.length) {
+          var localS = getScanHistory();
+          var localTsSet = new Set(localS.map(function(a){ return a.timestamp; }));
+          // Group GitHub rows by Audit Timestamp
+          var grouped = {};
+          for (var j = 0; j < data.audit.length; j++) {
+            var ga = data.audit[j];
+            var ts = ga['Audit Timestamp'] || '';
+            if (!grouped[ts]) grouped[ts] = { overall: ga['Overall Comments'] || '', items: [] };
+            grouped[ts].items.push({
+              date: ga['Date'] || '', time: ga['Time'] || '', timestamp: ts,
+              item_id: ga['Item ID'] || '', item_name: ga['Item Name'] || '',
+              room: ga['Room'] || '', matched: ga['Matched'] || 'Yes',
+              date_checked: ga['Date Checked'] || 'Yes',
+              stock_checked: ga['Stock Checked'] || 'Yes',
+              cleaned: ga['Cleaned'] || 'No',
+              item_comment: ga['Item Comment'] || ''
+            });
+          }
+          var addedA = 0;
+          for (var ts in grouped) {
+            if (!localTsSet.has(ts)) {
+              localS.push({ timestamp: ts, type: 'scan', overall_comments: grouped[ts].overall, items: grouped[ts].items });
+              addedA++;
+            }
+          }
+          if (addedA > 0) { saveScanHistory(localS); console.log('Merged ' + addedA + ' audit records from GitHub'); }
+        }
+      } catch(e){ console.warn('loadFromGitHub failed (offline?):', e); }
+    }
+
     function saveScanAudit(){
       var now = new Date(), timestamp = now.toISOString(), rows = [];
       var overallComments = (document.getElementById('auditOverallComments').value || '').trim();
@@ -1166,6 +1253,9 @@
       var history = getScanHistory();
       history.push({ timestamp: timestamp, type: 'scan', overall_comments: overallComments, items: rows });
       saveScanHistory(history);
+
+      // Push to GitHub CSV
+      pushToGitHub('audit', { rows: rows, overall_comments: overallComments });
     }
 
     function saveFridgeCheck(data){
@@ -1186,6 +1276,19 @@
       var history = getFridgeHistory();
       history.push(record);
       saveFridgeHistory(history);
+
+      // Push to GitHub CSV
+      pushToGitHub('fridge', { rows: [{
+        fridge: 'Fridge ' + data.fridge_number,
+        date: data.date,
+        time: data.time,
+        current_temp: data.current,
+        min_temp: data.min,
+        max_temp: data.max,
+        thermometer_reset: data.reset,
+        comments: data.comments,
+        checked_by: data.checked_by
+      }] });
     }
 
 
@@ -1761,6 +1864,10 @@
       var csvLoaded = await tryLoadCSV();
       if (csvLoaded) console.log('Loaded '+ITEMS.size+' items from List_Items.csv');
       else console.log('Using '+ITEMS.size+' embedded items');
+
+      // Merge any records from GitHub that this device doesn't have yet
+      await loadFromGitHub();
+
       updateHomeDashboard();
     }
     init();
