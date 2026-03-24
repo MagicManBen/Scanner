@@ -123,14 +123,37 @@
     .room-count { font-size: 12px; color: var(--muted); padding: 2px 8px;
       border: 1px solid var(--line); border-radius: 9999px; background: rgba(255,255,255,.4); }
     .group-items { display: grid; gap: 10px; padding: 12px; }
-    .item-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-      gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 14px;
-      background: rgba(255,255,255,.45); text-align: left; animation: itemIn .25s ease both; }
+    .item-card { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 14px;
+      background: rgba(255,255,255,.45); text-align: left; animation: itemIn .25s ease both; position: relative; }
     @keyframes itemIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    .item-card .item-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
     .item-card .item-id { font-family: ui-monospace, monospace; font-size: 13px; color: var(--muted); }
     .item-card .item-name { font-weight: 600; }
     .match-ok { color: var(--accent); font-size: 20px; }
     .match-fail { color: var(--danger); font-size: 16px; font-weight: 600; }
+    .item-checks { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+    .item-check { display: flex; align-items: center; gap: 5px; font-size: .8rem; cursor: pointer; }
+    .item-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .item-actions { display: flex; gap: 8px; align-items: center; padding-top: 2px; }
+    .item-actions .btn-remove { background: none; border: none; color: var(--danger); font-size: .82rem;
+      font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 8px;
+      transition: background .15s; }
+    .item-actions .btn-remove:hover { background: rgba(255,59,48,.1); }
+    .item-comment { flex: 1; font-size: .85rem; padding: 6px 10px; border-radius: 10px;
+      border: 1px solid var(--line); background: rgba(255,255,255,.5); color: var(--text);
+      font-family: inherit; resize: none; min-height: 32px; }
+    .item-comment::placeholder { color: var(--muted); }
+    .audit-overall-comments { margin: 16px 0; text-align: left; }
+    .audit-overall-comments label { display: block; font-weight: 600; margin-bottom: 6px; font-size: .95rem; }
+    .audit-overall-comments textarea { width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--line); background: rgba(255,255,255,.5); color: var(--text);
+      font-size: .95rem; font-family: inherit; resize: vertical; min-height: 70px; }
+    .audit-overall-comments textarea::placeholder { color: var(--muted); }
+    .item-card.removed { opacity: .35; pointer-events: none; }
+    .item-card .btn-restore { display: none; background: none; border: 1px solid var(--accent); color: var(--accent);
+      font-size: .78rem; font-weight: 600; cursor: pointer; padding: 3px 10px; border-radius: 8px; }
+    .item-card.removed .btn-restore { display: inline-block; pointer-events: auto; }
+    .item-card.removed .item-checks, .item-card.removed .item-actions { display: none; }
 
     .stats { display: flex; gap: 12px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
     .stat { padding: 10px 20px; border: 1px solid var(--line); border-radius: 14px;
@@ -431,6 +454,13 @@
     #screen-results .item-card .item-name { color: #e8eaed; }
     #screen-results .match-ok { color: #22c55e; }
     #screen-results .match-fail { color: #ff453a; }
+    #screen-results .item-check { color: #c0c4cc; }
+    #screen-results .item-comment { background: #23262d; border-color: #383d45; color: #e8eaed; }
+    #screen-results .item-comment::placeholder { color: #666; }
+    #screen-results .btn-remove { color: #ff453a !important; }
+    #screen-results .audit-overall-comments label { color: #e8eaed; }
+    #screen-results .audit-overall-comments textarea { background: #23262d; border-color: #383d45; color: #e8eaed; }
+    #screen-results .audit-overall-comments textarea::placeholder { color: #666; }
   </style>
 </head>
 <body>
@@ -576,6 +606,10 @@
         <div class="stat"><div class="label">Total</div><div class="value" id="totalCount">0</div></div>
       </div>
       <div class="results-scroll" id="resultsBody"></div>
+      <div class="audit-overall-comments">
+        <label for="auditOverallComments">Overall Comments</label>
+        <textarea id="auditOverallComments" placeholder="Add any overall comments about this audit (optional)"></textarea>
+      </div>
       <div style="margin-top:16px">
         <button class="btn primary" id="btnConfirm" style="padding:16px 40px; font-size:1.15rem">Confirm &#10003;</button>
       </div>
@@ -696,6 +730,10 @@
         <div class="stat"><div class="label">Total</div><div class="value" id="detailTotal">0</div></div>
       </div>
       <div class="results-scroll" id="detailBody"></div>
+      <div id="detailOverallComments" class="audit-overall-comments" style="display:none;">
+        <label>Overall Comments</label>
+        <div class="fd-row" id="detailOverallText" style="margin-top:4px;"></div>
+      </div>
       <div style="margin-top:24px; text-align:center;">
         <button class="btn danger-sm" id="btnDeleteAudit">Delete This Audit</button>
       </div>
@@ -937,10 +975,14 @@
       if (unknown.length > 0) groups.set('Unknown / Not in database', unknown.map(function(u){ return { code:u.code, name:null, room:null }; }));
 
       var container = document.getElementById('resultsBody'); container.innerHTML = '';
+      document.getElementById('auditOverallComments').value = '';
+
       if (scans.length === 0){
         container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No items were scanned.</p>';
         show('screen-results'); return;
       }
+
+      var itemIdx = 0;
       groups.forEach(function(items, room){
         var details = document.createElement('details'); details.className = 'room-group'; details.setAttribute('open','open');
         var isUnknown = room === 'Unknown / Not in database';
@@ -949,13 +991,69 @@
         details.appendChild(summary);
         var wrap = document.createElement('div'); wrap.className = 'group-items';
         for (var k = 0; k < items.length; k++){
-          var it = items[k], card = document.createElement('div'); card.className = 'item-card';
-          card.innerHTML = '<span class="item-id mono">'+escapeHtml(it.code)+'</span><span class="item-name">'+escapeHtml(it.name||'(Unknown item)')+'</span><span class="'+(it.name?'match-ok':'match-fail')+'">'+(it.name?'\u2713':'?')+'</span>';
+          var it = items[k];
+          var card = document.createElement('div'); card.className = 'item-card';
+          card.setAttribute('data-code', it.code);
+          card.setAttribute('data-idx', String(itemIdx));
+
+          // Top row: ID, name, match icon
+          var top = document.createElement('div'); top.className = 'item-top';
+          top.innerHTML = '<span class="item-id mono">'+escapeHtml(it.code)+'</span><span class="item-name">'+escapeHtml(it.name||'(Unknown item)')+'</span><span class="'+(it.name?'match-ok':'match-fail')+'">'+(it.name?'\u2713':'?')+'</span>';
+          card.appendChild(top);
+
+          // Checkbox row: Date Checked, Stock Checked, Cleaned
+          var checks = document.createElement('div'); checks.className = 'item-checks';
+          checks.innerHTML = '<label class="item-check"><input type="checkbox" data-field="date_checked" checked><span>Date Checked</span></label>'
+            + '<label class="item-check"><input type="checkbox" data-field="stock_checked" checked><span>Stock Checked</span></label>'
+            + '<label class="item-check"><input type="checkbox" data-field="cleaned"><span>Cleaned</span></label>';
+          card.appendChild(checks);
+
+          // Actions row: comment + remove
+          var actions = document.createElement('div'); actions.className = 'item-actions';
+          actions.innerHTML = '<textarea class="item-comment" data-field="item_comment" placeholder="Item comment\u2026" rows="1"></textarea>'
+            + '<button type="button" class="btn-remove" title="Remove item">\u2715 Remove</button>';
+          card.appendChild(actions);
+
+          // Restore button (shown only when removed)
+          var restoreBtn = document.createElement('button');
+          restoreBtn.type = 'button'; restoreBtn.className = 'btn-restore'; restoreBtn.textContent = '\u21a9 Restore';
+          card.appendChild(restoreBtn);
+
           wrap.appendChild(card);
+          itemIdx++;
         }
         details.appendChild(wrap); container.appendChild(details);
       });
+
+      // Hook up remove/restore
+      container.querySelectorAll('.btn-remove').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var card = btn.closest('.item-card'); card.classList.add('removed');
+          updateResultCounts();
+        });
+      });
+      container.querySelectorAll('.btn-restore').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var card = btn.closest('.item-card'); card.classList.remove('removed');
+          updateResultCounts();
+        });
+      });
+
       show('screen-results');
+    }
+
+    function updateResultCounts(){
+      var all = document.querySelectorAll('#resultsBody .item-card');
+      var matched = 0, unknown = 0, total = 0;
+      all.forEach(function(card){
+        if (card.classList.contains('removed')) return;
+        total++;
+        var matchSpan = card.querySelector('.match-ok');
+        if (matchSpan) matched++; else unknown++;
+      });
+      document.getElementById('matchCount').textContent = String(matched);
+      document.getElementById('unknownCount').textContent = String(unknown);
+      document.getElementById('totalCount').textContent = String(total);
     }
 
 
@@ -981,15 +1079,36 @@
 
     function saveScanAudit(){
       var now = new Date(), timestamp = now.toISOString(), rows = [];
-      for (var i = 0; i < scans.length; i++){
-        var code = scans[i], item = ITEMS.get(code);
-        rows.push({ date: now.toLocaleDateString('en-GB'), time: now.toLocaleTimeString('en-GB'),
-          timestamp: timestamp, item_id: code, item_name: item?item.name:'(Unknown)',
-          room: item?item.room:'', matched: item?'Yes':'No' });
-      }
+      var overallComments = (document.getElementById('auditOverallComments').value || '').trim();
+
+      // Read state from DOM cards
+      var cards = document.querySelectorAll('#resultsBody .item-card');
+      cards.forEach(function(card){
+        if (card.classList.contains('removed')) return; // skip removed items
+        var code = card.getAttribute('data-code');
+        var item = ITEMS.get(code);
+        var dateChecked = card.querySelector('[data-field="date_checked"]').checked ? 'Yes' : 'No';
+        var stockChecked = card.querySelector('[data-field="stock_checked"]').checked ? 'Yes' : 'No';
+        var cleaned = card.querySelector('[data-field="cleaned"]').checked ? 'Yes' : 'No';
+        var itemComment = (card.querySelector('[data-field="item_comment"]').value || '').trim();
+
+        rows.push({
+          date: now.toLocaleDateString('en-GB'),
+          time: now.toLocaleTimeString('en-GB'),
+          timestamp: timestamp,
+          item_id: code,
+          item_name: item ? item.name : '(Unknown)',
+          room: item ? item.room : '',
+          matched: item ? 'Yes' : 'No',
+          date_checked: dateChecked,
+          stock_checked: stockChecked,
+          cleaned: cleaned,
+          item_comment: itemComment
+        });
+      });
       if (rows.length === 0) return;
       var history = getScanHistory();
-      history.push({ timestamp: timestamp, type: 'scan', items: rows });
+      history.push({ timestamp: timestamp, type: 'scan', overall_comments: overallComments, items: rows });
       saveScanHistory(history);
     }
 
@@ -1103,8 +1222,13 @@
         var audit = scanHistory[i];
         for (var j = 0; j < audit.items.length; j++){
           var r = audit.items[j];
-          scanRows.push({ 'Date': r.date, 'Time': r.time, 'Audit #': i+1,
-            'Item ID': r.item_id, 'Item Name': r.item_name, 'Room': r.room, 'Matched': r.matched });
+          scanRows.push({
+            'Date': r.date, 'Time': r.time, 'Audit #': i+1,
+            'Item ID': r.item_id, 'Item Name': r.item_name, 'Room': r.room, 'Matched': r.matched,
+            'Date Checked': r.date_checked || 'Yes', 'Stock Checked': r.stock_checked || 'Yes',
+            'Cleaned': r.cleaned || 'No', 'Item Comment': r.item_comment || '',
+            'Overall Comments': audit.overall_comments || ''
+          });
         }
       }
       if (scanRows.length > 0){
@@ -1298,11 +1422,45 @@
         var wrap = document.createElement('div'); wrap.className='group-items';
         for (var k = 0; k < items.length; k++){
           var it = items[k], card = document.createElement('div'); card.className='item-card';
-          card.innerHTML = '<span class="item-id mono">'+escapeHtml(it.item_id)+'</span><span class="item-name">'+escapeHtml(it.item_name||'(Unknown item)')+'</span><span class="'+(it.matched==='Yes'?'match-ok':'match-fail')+'">'+(it.matched==='Yes'?'\u2713':'?')+'</span>';
+
+          // Top row
+          var top = document.createElement('div'); top.className = 'item-top';
+          top.innerHTML = '<span class="item-id mono">'+escapeHtml(it.item_id)+'</span><span class="item-name">'+escapeHtml(it.item_name||'(Unknown item)')+'</span><span class="'+(it.matched==='Yes'?'match-ok':'match-fail')+'">'+(it.matched==='Yes'?'\u2713':'?')+'</span>';
+          card.appendChild(top);
+
+          // Checks row (read-only display)
+          var dc = it.date_checked || 'Yes', sc = it.stock_checked || 'Yes', cl = it.cleaned || 'No';
+          var checksHtml = '<div class="item-checks" style="pointer-events:none;">'
+            + '<label class="item-check"><input type="checkbox" disabled '+(dc==='Yes'?'checked':'')+'><span>Date</span></label>'
+            + '<label class="item-check"><input type="checkbox" disabled '+(sc==='Yes'?'checked':'')+'><span>Stock</span></label>'
+            + '<label class="item-check"><input type="checkbox" disabled '+(cl==='Yes'?'checked':'')+'><span>Cleaned</span></label>'
+            + '</div>';
+          var checksDiv = document.createElement('div'); checksDiv.innerHTML = checksHtml;
+          card.appendChild(checksDiv.firstChild);
+
+          // Item comment if present
+          if (it.item_comment){
+            var cmt = document.createElement('div');
+            cmt.style.cssText = 'font-size:.85rem; color:var(--muted); padding:4px 0 0; font-style:italic;';
+            cmt.textContent = '\ud83d\udcac ' + it.item_comment;
+            card.appendChild(cmt);
+          }
+
           wrap.appendChild(card);
         }
         details.appendChild(wrap); container.appendChild(details);
       });
+
+      // Overall comments
+      var ocSection = document.getElementById('detailOverallComments');
+      var ocText = document.getElementById('detailOverallText');
+      if (audit.overall_comments){
+        ocSection.style.display = '';
+        ocText.textContent = audit.overall_comments;
+      } else {
+        ocSection.style.display = 'none';
+      }
+
       currentScanIndex = idx;
       show('screen-detail');
     }
