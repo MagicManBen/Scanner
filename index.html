@@ -739,6 +739,7 @@
         timestamp: now.toISOString(),
         type: 'fridge',
         date: data.date,
+        time: data.time,
         current_temp: data.current,
         min_temp: data.min,
         max_temp: data.max,
@@ -783,7 +784,7 @@
       var fridgeRows = [];
       for (var k = 0; k < fridgeHistory.length; k++){
         var fc = fridgeHistory[k];
-        fridgeRows.push({ 'Date': fc.date, 'Current Temp (\u00b0C)': fc.current_temp,
+        fridgeRows.push({ 'Date': fc.date, 'Time': fc.time||'', 'Current Temp (\u00b0C)': fc.current_temp,
           'Min Temp (\u00b0C)': fc.min_temp, 'Max Temp (\u00b0C)': fc.max_temp,
           'Thermometer Reset': fc.thermometer_reset, 'Comments': fc.comments||'',
           'Checked By': fc.checked_by });
@@ -979,7 +980,7 @@
       var d = new Date(record.timestamp);
       var fields = [
         ['Date', record.date],
-        ['Time Recorded', d.toLocaleTimeString('en-GB')],
+        ['Time', record.time || d.toLocaleTimeString('en-GB')],
         ['Current Temp', record.current_temp + '\u00b0C'],
         ['Min Temp', record.min_temp + '\u00b0C'],
         ['Max Temp', record.max_temp + '\u00b0C'],
@@ -1022,9 +1023,12 @@
       var dateVal = document.getElementById('fDate').value;
       var parts = dateVal.split('-');
       var formattedDate = parts[2]+'/'+parts[1]+'/'+parts[0];
+      var now = new Date();
+      var timeStr = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
 
       saveFridgeCheck({
         date: formattedDate,
+        time: timeStr,
         current: parseFloat(document.getElementById('fCurrent').value),
         min: parseFloat(document.getElementById('fMin').value),
         max: parseFloat(document.getElementById('fMax').value),
